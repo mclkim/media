@@ -1,0 +1,10 @@
+﻿.buildpath
+.idea
+.project
+.settings
+composer.lock
+**/_compile/**
+log/**
+logs/**
+tmp/**
+vendor

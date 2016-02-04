@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko" class="no-js webkit safari chrome win">
+<head>
+<!-- head -->
+{#head}
+</head>
+<body class="compact-container">
+	<div id="layout-canvas">
+		<div class="layout">
+
+			<!-- Main Menu -->
+			<div class="layout-row min-size">
+				<!-- mainmenu -->
+				{#mainmenu}
+				<!-- /mainmenu -->
+			</div>
+
+			<!-- flyoutContent -->
+			{#sidepanel_flyout}
+
+			<div class="layout-row">
+				<!--{?flyoutContent}-->
+				<div class="layout flyout-container" data-control="flyout"
+					data-flyout-width="400" data-flyout-toggle="#layout-sidenav">
+
+					<div class="layout-cell flyout">{flyoutContent}</div>
+					<!--{:}-->
+					<div class="layout flyout-container">
+						<!--{/}-->
+
+						<!-- Side Navigation -->
+						{#sidenavi}
+
+						<!-- Side panel -->
+						{?sidePanelContent}
+						<div class="layout-cell width-300 hide-on-small"
+							id="layout-side-panel" data-control="layout-sidepanel">
+							{sidePanelContent}</div>
+						{/}
+
+						<!-- Content Body -->
+						<div class="layout-cell layout-container" id="layout-body">
+							<div class="layout-relative">
+
+								<div class="layout">
+									<!-- Breadcrumb -->
+									{?breadcrumbContent}
+									<div class="control-breadcrumb">{breadcrumbContent}</div>
+									{/}
+
+									<!-- Content -->
+									<div class="layout-row">
+										<!-- body -->
+										{#body}
+										<!-- /body -->
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<!-- Flash Messages -->
+		<div id="layout-flash-messages">{#flash_messages}</div>
+</body>
+</html>
