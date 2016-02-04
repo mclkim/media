@@ -1,5 +1,4 @@
-﻿!robots.txt
-.buildpath
+﻿.buildpath
 .idea
 .project
 .settings
@@ -10,3 +9,4 @@ log
 logs
 tmp
 vendor
+!robots.txt
