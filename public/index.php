@@ -6,7 +6,7 @@
  */
 define ( 'ROOT_PATH', dirname ( __FILE__ ) );
 define ( 'BASE_PATH', dirname ( ROOT_PATH ) );
-// http://localhost/media/public/_template/assets/vendor/jquery/jquery-1.12.0.min.js?v313
+
 /**
  * ---------------------------------------------------------------
  * ini_set('date.timezone', 'Asia/Seoul'); //한국시간(timezone)설정

@@ -1,10 +1,12 @@
-﻿.buildpath
+﻿!robots.txt
+.buildpath
 .idea
 .project
 .settings
+/config/config.php
+_compile
 composer.lock
-**/_compile/**
-log/**
-logs/**
-tmp/**
+log
+logs
+tmp
 vendor
