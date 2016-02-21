@@ -36,6 +36,7 @@ if (! file_exists ( $helperPath )) {
  * |
  */
 $loader = require_once BASE_PATH . '/vendor/autoload.php';
+$loader->addPsr4 ( 'App\\', BASE_PATH . '/app' ); // Application Controller
 
 /**
  * |-------------------------------------------------------------------

@@ -16,7 +16,26 @@
 						<td></td>
 						<td></td>
 					</tr>
-
+<!-- {@items} -->					
+					<tr data-type="media-item" data-item-type="{.item}"
+						data-path="/Folder Test/image" data-title="image" data-size="1 파일"
+						data-last-modified="" data-last-modified-ts=""
+						data-public-url="/october/storage/app/media/Folder Test/image"
+						data-document-type="{.type}" data-folder="/Folder Test" tabindex="0">
+						<td>
+							<div class="item-title no-wrap-text">
+								<i class="{.icon}"></i> {.title} <a href="#" data-rename
+									data-control="popup"
+									data-request-data="path: '/Folder Test/image', listId: 'MediaManager-manager-item-list', type: 'folder'"
+									data-handler="manager::onLoadRenamePopup" data-z-index="1200"><i
+									data-rename-control class="icon-terminal"></i></a>
+							</div>
+						</td>
+						<td>{=bytesize(.size,2)}</td>
+						<td>{=date("y-m-d h:i A",.modified)}</td>
+					</tr>
+<!-- {/} -->										
+<!-- {?false} -->
 					<tr data-type="media-item" data-item-type="folder"
 						data-path="/Folder Test/image" data-title="image" data-size="1 파일"
 						data-last-modified="" data-last-modified-ts=""
@@ -202,6 +221,7 @@
 						<td>5.28 MB</td>
 						<td>Jan 23, 2016</td>
 					</tr>
+<!-- {/}			 -->		
 				</tbody>
 			</table>
 

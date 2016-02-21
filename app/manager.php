@@ -9,14 +9,23 @@ class manager extends Controller {
 	function execute() {
 	}
 	public function onGoToFolder() {
-		logger ( base_path() );
-
+		logger ( base_path () );
+		
 		$tpl = $this->container->get ( 'template' );
+		$ftp = $this->container->get ( 'ftp' );
+		
+		$model = new \App\Models\FtpManager ( $ftp );
+		$items = $model->listFolderContents ( '/HDD1' );
+		logger ( '', $items );
+		
+		$tpl->assign ( array (
+				'items' => $items 
+		) );
 		
 		$tpl->define ( array (
 				"index" => "partials/item_list.html" 
 		) );
-
+		
 		$itemlist = $tpl->fetch ( "index" );
 		
 		$tpl->define ( array (
@@ -24,7 +33,7 @@ class manager extends Controller {
 		) );
 		
 		$folderpath = $tpl->fetch ( "index" );
-
+		
 		return [ 
 				'#MediaManager-manager-item-list' => $itemlist,
 				'#MediaManager-manager-folder-path' => $folderpath 
