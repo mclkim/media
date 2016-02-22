@@ -188,7 +188,7 @@ class FtpLibrary {
 			}
 			
 			$isdir = ($listline ['dirorfile'] === 'd');
-			$now = now();
+// 			$now = now();
 			$stamp = strtotime ( $listline ['mtime'] );
 			$ext = pathinfo ( $listline ['dirfilename'], PATHINFO_EXTENSION ) ?  : 'unknown';
 			

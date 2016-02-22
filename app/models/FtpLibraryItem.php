@@ -121,6 +121,7 @@ class FtpLibraryItem extends Singleton {
 		// if (! $this->isFile ()) {
 		// return null;
 		// }
+		
 		if ($item == FtpLibraryItem::TYPE_FOLDER)
 			return null;
 		

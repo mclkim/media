@@ -3,10 +3,13 @@
 .project
 .settings
 !robots.txt
+<<<<<<< HEAD
+=======
+_compile/**
+>>>>>>> ecfab997e111810749f9395998dba63c135f62bf
 /config/config.php
-_compile
 composer.lock
-log
-logs
-tmp
+log/**
+logs/**
+tmp/**
 vendor
