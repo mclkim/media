@@ -2,6 +2,7 @@
 .idea
 .project
 .settings
+!robots.txt
 /config/config.php
 _compile
 composer.lock
@@ -9,4 +10,3 @@ log
 logs
 tmp
 vendor
-!robots.txt
