@@ -188,6 +188,9 @@ class FtpLibraryItem extends Singleton {
 		}
 	}
 	public function byteconvert($bytes) {
+		if (empty ( $bytes ) || $bytes < 0)
+			return '0 B';
+
 		$symbol = array (
 				'B',
 				'KB',

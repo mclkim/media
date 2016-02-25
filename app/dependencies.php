@@ -21,7 +21,6 @@ $container ['config'] = function ($c) {
 // www.xtac.net
 $container ['template'] = function ($c) {
 	$tpl = new \Template_ ();
-	// $tpl->skin = 'mediamanager';
 	return $tpl;
 };
 

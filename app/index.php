@@ -12,11 +12,14 @@ class index extends Controller {
 		$ftp = $this->container->get ( 'ftp' );
 		
 		$model = new \App\Models\FtpManager ( $ftp );
-		$items = $model->listFolderContents ( '/HDD1' );
-		logger ( '', $items );
+		
+		$folder = $model->getCurrentFolder ();
+		$items = $model->listFolderContents ( $folder );
 		
 		$tpl->assign ( array (
 				'baseUrl' => $this->router ()->getBaseUrl (),
+				'currentFolder' => $folder,
+				'isRootFolder' => $folder == '/',				
 				'items' => $items,
 				'flyoutContent' => '',
 				'sidePanelContent' => '',

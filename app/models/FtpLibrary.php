@@ -3,7 +3,7 @@
 namespace App\Models;
 
 class FtpLibrary {
-	const SORT_BY_TITLE = 'title';
+	const SORT_BY_NAME = 'name';
 	const SORT_BY_SIZE = 'size';
 	const SORT_BY_MODIFIED = 'modified';
 	protected $ftp = null;
@@ -161,7 +161,7 @@ class FtpLibrary {
 	protected function parseRawList($directory = null, $recursive = false) {
 		try {
 			// $list = $this->ftp->rawlist ( $directory );
-			$options = $recursive ? '-alnR' : '-aln';
+			// $options = $recursive ? '-alnR' : '-aln';
 			$options = '-rtla';
 			$list = $this->ftp->rawlist ( $options . ' ' . $directory );
 		} catch ( Exception $e ) {
@@ -188,20 +188,20 @@ class FtpLibrary {
 			}
 			
 			$isdir = ($listline ['dirorfile'] === 'd');
-// 			$now = now();
-			$stamp = strtotime ( $listline ['mtime'] );
-			$ext = pathinfo ( $listline ['dirfilename'], PATHINFO_EXTENSION ) ?  : 'unknown';
-			
 			$item = ($isdir) ? 'folder' : 'file';
-			
+
+			$mtime = strtotime ( $listline ['mtime'] );
+			$stamp = ($mtime > time()) ? strtotime("-1 year", $mtime):$mtime;
+
+			$ext = pathinfo ( $listline ['dirfilename'], PATHINFO_EXTENSION ) ?  : 'unknown';
+						
 			$name = $listline ['dirfilename'];
-			$endung = strtolower ( substr ( strrchr ( $name, "." ), 1 ) );
-			$path = "$directory/$name";
-			logger ( $endung );
+			$path = rtrim ( $directory, '/' );//TODO::
 			$type = FtpLibraryItem::getInstance ()->getFileType ( $item, $ext );
 			$icon = FtpLibraryItem::getInstance ()->itemTypeToIconClass ( $item, $type );
+			$byte = FtpLibraryItem::getInstance ()->byteconvert ( $listline ['size'] );
 			
-			if ($listline ["dirorfile"] == "d") {
+			if ($isdir) {
 				$folders_list [] = array (
 						'item' => $item,
 						'icon' => $icon,
@@ -211,8 +211,9 @@ class FtpLibrary {
 						'owner' => $listline ['owner'],
 						'group' => $listline ['group'],
 						'size' => $listline ['size'],
+						'byte' => $byte,
 						'date' => $listline ['mtime'],
-						'title' => $listline ['dirfilename'],
+						'name' => $name,
 						'path' => $path,
 						'modified' => $stamp,
 						'raw' => $listline ['raw'] 
@@ -226,12 +227,13 @@ class FtpLibrary {
 						'owner' => $listline ['owner'],
 						'group' => $listline ['group'],
 						'size' => $listline ['size'],
+						'byte' => $byte,
 						'date' => $listline ['mtime'],
-						'title' => $listline ['dirfilename'],
+						'name' => $name,
 						'path' => $path,
 						'modified' => $stamp,
 						'ext' => $ext,
-						'base64' => base64_encode ( $listline ['dirfilename'] ),
+						// 'base64' => base64_encode ( $listline ['dirfilename'] ),
 						'raw' => $listline ['raw'] 
 				);
 			}
@@ -249,24 +251,24 @@ class FtpLibrary {
 	 *        	Specifies the folder path relative the the Library root.
 	 * @param string $sortBy
 	 *        	Determines the sorting preference.
-	 *        	Supported values are 'title', 'size', 'lastModified' (see SORT_BY_XXX class constants) and FALSE.
+	 *        	Supported values are 'name', 'size', 'lastModified' (see SORT_BY_XXX class constants) and FALSE.
 	 * @param string $filter
 	 *        	Determines the document type filtering preference.
 	 *        	Supported values are 'image', 'video', 'audio', 'document' (see FILE_TYPE_XXX constants of MediaLibraryItem class).
 	 * @return array Returns an array of MediaLibraryItem objects.
 	 */
-	public function listFolderContents($folder = '/', $sortBy = 'title', $filter = null) {
-		$fullFolderPath = self::validatePath ( $folder );
+	public function listFolderContents($folder = '/', $sortBy = 'name', $filter = null) {
+		$folder = self::validatePath ( $folder );
 		
-		$folderContents = $this->parseRawList ( $fullFolderPath );
+		$folderContents = $this->parseRawList ( $folder );
 		
 		/**
 		 * Sort the result and combine the file and folder lists
 		 */
 		
 		if ($sortBy !== false) {
-			$this->sortItemList ( $folderContents ['files'], $sortBy );
 			$this->sortItemList ( $folderContents ['folders'], $sortBy );
+			$this->sortItemList ( $folderContents ['files'], $sortBy );
 		}
 		
 		$this->filterItemList ( $folderContents ['files'], $filter );
@@ -296,19 +298,14 @@ class FtpLibrary {
 		
 		usort ( $itemList, function ($a, $b) use($sortBy) {
 			switch ($sortBy) {
-				case self::SORT_BY_TITLE :
-					return strcasecmp ( $a->title, $b->title );
+				case self::SORT_BY_NAME :
+					return strcasecmp ( $a[$sortBy], $b[$sortBy] );
 				case self::SORT_BY_SIZE :
-					if ($a->size > $b->size)
-						return - 1;
-					
-					return $a->size < $b->size ? 1 : 0;
-					break;
 				case self::SORT_BY_MODIFIED :
-					if ($a->lastModified > $b->lastModified)
+					if ($a[$sortBy]> $b[$sortBy])
 						return - 1;
 					
-					return $a->lastModified < $b->lastModified ? 1 : 0;
+					return ($a[$sortBy]<$b[$sortBy] )? 1 : 0;
 					break;
 			}
 		} );

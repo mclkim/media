@@ -9,16 +9,28 @@ class manager extends Controller {
 	function execute() {
 	}
 	public function onGoToFolder() {
-		logger ( base_path () );
+		// logger ( base_path () );
+		$path = $this->getParameter ( 'path' );
+		
+		logger ( 'onGoToFolder' );
+		logger ( $path );
 		
 		$tpl = $this->container->get ( 'template' );
 		$ftp = $this->container->get ( 'ftp' );
 		
 		$model = new \App\Models\FtpManager ( $ftp );
-		$items = $model->listFolderContents ( '/HDD1' );
-		logger ( '', $items );
 		
+		$model->setCurrentFolder ( $path );
+		$folder = $model->getCurrentFolder ();
+		$items = $model->listFolderContents ( $folder );
+		
+		logger ( 'onGoToFolder' );
+ 		logger ( $folder, $items );
+		
+		//
 		$tpl->assign ( array (
+				'currentFolder' => $folder,
+				'isRootFolder' => $folder == '/',
 				'items' => $items 
 		) );
 		
@@ -28,6 +40,7 @@ class manager extends Controller {
 		
 		$itemlist = $tpl->fetch ( "index" );
 		
+		//
 		$tpl->define ( array (
 				"index" => "partials/folder_path.html" 
 		) );

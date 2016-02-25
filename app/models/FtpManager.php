@@ -11,19 +11,40 @@ class FtpManager extends FtpLibrary {
 	const SELECTION_MODE_FIXED_RATIO = 'fixed-ratio';
 	const SELECTION_MODE_FIXED_SIZE = 'fixed-size';
 	const FILTER_EVERYTHING = 'everything';
-	protected function setCurrentFolder($path) {
-		$path = FtpLibrary::validatePath ( $path );
+	public function setCurrentFolder($folder) {
+		$folder = FtpLibrary::validatePath ( $folder );
+		// logger ( 'setCurrentFolder' );
+		// logger ( $folder );
 		
-		$this->putSession ( 'current_folder', $path );
+		$_SESSION ['current_folder'] = $folder;
 	}
-	protected function getCurrentFolder() {
-		$folder = $this->getSession ( 'current_folder', self::FOLDER_ROOT );
+	public function getCurrentFolder() {
+		// $folder = $this->getSession ( 'current_folder', self::FOLDER_ROOT );
+		$folder = if_exists ( $_SESSION, 'current_folder', '/' );
+		// logger ( 'getCurrentFolder' );
+		// logger ( $folder );
 		
 		return $folder;
 	}
-	protected function listFolderItems($folder, $filter, $sortBy) {
-		$filter = $filter !== self::FILTER_EVERYTHING ? $filter : null;
-		
-		return $this->listFolderContents ( $folder, $sortBy, $filter );
-	}
+	// public function listFolderItems($folder, $filter, $sortBy) {
+	// $filter = $filter !== self::FILTER_EVERYTHING ? $filter : null;
+	
+	// return $this->listFolderContents ( $folder, $sortBy, $filter );
+	// }
+ //    public function splitPathToSegments($path)
+ //    {
+ //        $path = FtpLibrary::validatePath($path, true);
+ //        $path = explode('/', ltrim($path, '/'));
+
+ //        $result = [];
+ //        while (count($path) > 0) {
+ //            $folder = array_pop($path);
+
+ //            $result[$folder] = implode('/', $path).'/'.$folder;
+ //            if (substr($result[$folder], 0, 1) != '/')
+ //                $result[$folder] = '/'.$result[$folder];
+ //        }
+
+ //        return array_reverse($result);
+ //    }
 }
