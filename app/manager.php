@@ -23,9 +23,11 @@ class manager extends Controller {
 		$model->setCurrentFolder ( $path );
 		$folder = $model->getCurrentFolder ();
 		$items = $model->listFolderContents ( $folder );
+		$breadcrumb = $model->breadcrumb ( $folder );
 		
 		logger ( 'onGoToFolder' );
- 		logger ( $folder, $items );
+ 		// logger ( $folder, $items );
+ 		logger ( '', $breadcrumb );
 		
 		//
 		$tpl->assign ( array (
@@ -41,6 +43,11 @@ class manager extends Controller {
 		$itemlist = $tpl->fetch ( "index" );
 		
 		//
+		$tpl->assign ( array (
+				'breadcrumb' => $breadcrumb,
+				'searchMode'=>false,
+		) );
+
 		$tpl->define ( array (
 				"index" => "partials/folder_path.html" 
 		) );

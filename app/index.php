@@ -15,12 +15,16 @@ class index extends Controller {
 		
 		$folder = $model->getCurrentFolder ();
 		$items = $model->listFolderContents ( $folder );
+		$breadcrumb = $model->breadcrumb ( $folder );
 		
 		$tpl->assign ( array (
 				'baseUrl' => $this->router ()->getBaseUrl (),
 				'currentFolder' => $folder,
 				'isRootFolder' => $folder == '/',				
 				'items' => $items,
+				'breadcrumb' => $breadcrumb,
+				'searchMode'=>false,
+
 				'flyoutContent' => '',
 				'sidePanelContent' => '',
 				'breadcrumbContent' => '' 

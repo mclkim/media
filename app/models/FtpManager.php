@@ -26,25 +26,25 @@ class FtpManager extends FtpLibrary {
 		
 		return $folder;
 	}
-	// public function listFolderItems($folder, $filter, $sortBy) {
-	// $filter = $filter !== self::FILTER_EVERYTHING ? $filter : null;
-	
-	// return $this->listFolderContents ( $folder, $sortBy, $filter );
-	// }
- //    public function splitPathToSegments($path)
- //    {
- //        $path = FtpLibrary::validatePath($path, true);
- //        $path = explode('/', ltrim($path, '/'));
+	public function listFolderItems($folder, $filter, $sortBy) {
+		$filter = $filter !== self::FILTER_EVERYTHING ? $filter : null;
+		
+		return $this->listFolderContents ( $folder, $sortBy, $filter );
+	}
+	public function breadcrumb($path) {
+		$path = FtpLibrary::validatePath($path, true);
+		// $breadcrumb = explode ( "/", rtrim ( $path, '/' ) );
+		$path = explode('/', ltrim($path, '/'));
 
- //        $result = [];
- //        while (count($path) > 0) {
- //            $folder = array_pop($path);
-
- //            $result[$folder] = implode('/', $path).'/'.$folder;
- //            if (substr($result[$folder], 0, 1) != '/')
- //                $result[$folder] = '/'.$result[$folder];
- //        }
-
- //        return array_reverse($result);
- //    }
+		$parent = '';
+		foreach ( $path as $dir ) {
+			$chunks [] = array (
+				'dir' => $dir,
+				'path' => $parent,
+				'content' => $dir == '' ? 'Home' : $dir 
+			);
+			$parent = rtrim ( $parent, '/' ) . '/' . ltrim ( $dir, '/' );
+		}
+		return $chunks;
+	}
 }
