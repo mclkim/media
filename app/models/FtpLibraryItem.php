@@ -13,10 +13,13 @@ use Kaiser\Singleton;
 class FtpLibraryItem extends Singleton {
 	const TYPE_FILE = 'file';
 	const TYPE_FOLDER = 'folder';
+	const FILE_TYPE_AUDIO = 'audio';
+	const FILE_TYPE_COMPRESSED = 'compressed';
+	const FILE_TYPE_DOCUMENT = 'document';
+	const FILE_TYPE_EXECUTABLE = 'executable';
+	const FILE_TYPE_FLODER = 'floder';
 	const FILE_TYPE_IMAGE = 'image';
 	const FILE_TYPE_VIDEO = 'video';
-	const FILE_TYPE_AUDIO = 'audio';
-	const FILE_TYPE_DOCUMENT = 'document';
 	
 	/**
 	 *
@@ -59,6 +62,18 @@ class FtpLibraryItem extends Singleton {
 	 *      - cms.storage.media.audo_extensions
 	 */
 	protected static $defaultTypeExtensions = [ 
+			'audio' => [
+					'mp3',
+					'wav',
+					'wma',
+					'm4a',
+					'ogg'
+			],
+			'compressed' => [
+					'zip',
+					'tar',
+					'gz',
+			],
 			'image' => [ 
 					'gif',
 					'png',
@@ -75,17 +90,12 @@ class FtpLibraryItem extends Singleton {
 					'mkv',
 					'webm' 
 			],
-			'audio' => [ 
-					'mp3',
-					'wav',
-					'wma',
-					'm4a',
-					'ogg' 
-			] 
+
 	];
 	protected static $imageExtensions;
 	protected static $videoExtensions;
 	protected static $audioExtensions;
+	protected static $compressedExtensions;
 	
 	/**
 	 *
@@ -128,6 +138,7 @@ class FtpLibraryItem extends Singleton {
 		self::$imageExtensions = self::$defaultTypeExtensions ['image'];
 		self::$videoExtensions = self::$defaultTypeExtensions ['video'];
 		self::$audioExtensions = self::$defaultTypeExtensions ['audio'];
+		self::$compressedExtensions = self::$defaultTypeExtensions ['compressed'];
 		
 		// $extension = pathinfo ( $this->path, PATHINFO_EXTENSION );
 		if (! strlen ( $extension )) {
@@ -144,6 +155,10 @@ class FtpLibraryItem extends Singleton {
 		
 		if (in_array ( $extension, self::$audioExtensions )) {
 			return self::FILE_TYPE_AUDIO;
+		}
+		
+		if (in_array ( $extension, self::$compressedExtensions )) {
+			return self::FILE_TYPE_COMPRESSED;
 		}
 		
 		return self::FILE_TYPE_DOCUMENT;

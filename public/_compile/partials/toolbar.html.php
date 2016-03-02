@@ -1,4 +1,4 @@
-<?php /* Template_ 2.2.8 2016/02/04 10:56:23 D:\phpdev\workspace\media\public\_template\partials\toolbar.html 000001927 */ ?>
+<?php /* Template_ 2.2.8 2016/03/01 11:16:30 D:\phpdev\workspace\media\public\_template\partials\toolbar.html 000002049 */ ?>
 <div class="layout-row min-size">
 	<div class="control-toolbar toolbar-padded">
 		<div class="toolbar-item toolbar-primary">
@@ -15,6 +15,8 @@
 					data-command="refresh"></button>
 
 				<div class="btn-group offset-right">
+					<button type="button" class="btn btn-default oc-icon-download"
+						data-command="download">다운로드</button>
 					<button type="button" class="btn btn-default oc-icon-reply-all"
 						data-command="move">이동</button>
 					<button type="button" class="btn btn-default oc-icon-trash"

@@ -414,8 +414,10 @@
 					item.getAttribute('data-public-url')).replace('{path}',
 					item.getAttribute('data-path')).replace('{last-modified}',
 					item.getAttribute('data-last-modified-ts'))
-			if (documentType == 'image')
+					
+			if (documentType == 'image'){
 				this.loadSidebarThumbnail()
+			}
 		}
 		// "Go up" is selected
 		else if (items.length == 1 && items[0].hasAttribute('data-root')) {
@@ -704,6 +706,7 @@
 		formData.append('path', this.$el.find('[data-type="current-folder"]')
 				.val())
 		formData.append('X_OCTOBER_FILEUPLOAD', this.options.uniqueId)
+		formData.append('X-October-Request-Handler', this.options.alias + '::' + 'upload')
 	}
 	MediaManager.prototype.uploadCancelAll = function() {
 		this.dropzone.removeAllFiles(true)

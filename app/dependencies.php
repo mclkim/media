@@ -32,7 +32,7 @@ $container ['logger'] = function ($c) {
 
 // session
 $container ['session'] = function ($c) {
-	$session = new Kaiser\Session\FileSession ( __DIR__ . '/../tmp' );
+	$session = new Kaiser\Session\FileSession ( $c ['settings'] ['session'] ['path'] );
 	$session->start_session ();
 	return $session;
 };
@@ -50,5 +50,6 @@ $container ['ftp'] = function ($c) {
 	}
 	
 	$ftp->pasv ( $c ['config']->get ( 'ftp.passive' ) );
+	
 	return $ftp;
 };

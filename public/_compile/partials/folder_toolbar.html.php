@@ -1,15 +1,10 @@
-<?php /* Template_ 2.2.8 2016/02/04 10:56:23 D:\phpdev\workspace\media\public\_template\partials\folder_toolbar.html 000000830 */ ?>
+<?php /* Template_ 2.2.8 2016/03/01 09:35:03 D:\phpdev\workspace\media\public\_template\partials\folder_toolbar.html 000000566 */ ?>
 <div class="panel padding-less border-bottom triangle-down">
 	<div class="layout">
 		<div class="layout-cell">
 			<div class="layout-row" id="MediaManager-manager-folder-path">
-				<ul class="tree-path">
-					<li class="root"><a href="#" data-type="media-item"
-						data-item-type="folder" data-path="/" data-clear-search="true">라이브러리</a></li>
+<?php $this->print_("folder_path",$TPL_SCP,1);?>
 
-					<li><a href="#" data-type="media-item" data-item-type="folder"
-						data-path="/Folder Test">Folder Test</a></li>
-				</ul>
 			</div>
 		</div>
 		<div class="layout-cell">

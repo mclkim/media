@@ -176,7 +176,6 @@ class FtpLibrary {
 			);
 		}
 		
-		// include ANIME_PATH . DS . 'include/include.js.php';
 		$folders_list = array ();
 		$files_list = array ();
 		
@@ -189,20 +188,26 @@ class FtpLibrary {
 			
 			$isdir = ($listline ['dirorfile'] === 'd');
 			$item = ($isdir) ? 'folder' : 'file';
-
+			
+			// TODO::시간변환작업을 해야 하나??
+			$script_tz = date_default_timezone_get ();
+			date_default_timezone_set ( 'UTC' );
 			$mtime = strtotime ( $listline ['mtime'] );
-			$stamp = ($mtime > time()) ? strtotime("-1 year", $mtime):$mtime;
-
+			$stamp = ($mtime > time ()) ? strtotime ( "-1 year", $mtime ) : $mtime;
+			date_default_timezone_set ( $script_tz );
+			
 			$ext = pathinfo ( $listline ['dirfilename'], PATHINFO_EXTENSION ) ?  : 'unknown';
-						
+			
 			$name = $listline ['dirfilename'];
-			$path = rtrim ( $directory, '/' );//TODO::
+			$path = rtrim ( $directory, '/' ); // TODO::경로를 다른 방법으로 처리
 			$type = FtpLibraryItem::getInstance ()->getFileType ( $item, $ext );
 			$icon = FtpLibraryItem::getInstance ()->itemTypeToIconClass ( $item, $type );
 			$byte = FtpLibraryItem::getInstance ()->byteconvert ( $listline ['size'] );
 			
 			if ($isdir) {
 				$folders_list [] = array (
+						'name' => $name,
+						'path' => $path,
 						'item' => $item,
 						'icon' => $icon,
 						'type' => $type,
@@ -211,15 +216,16 @@ class FtpLibrary {
 						'owner' => $listline ['owner'],
 						'group' => $listline ['group'],
 						'size' => $listline ['size'],
-						'byte' => $byte,
-						'date' => $listline ['mtime'],
-						'name' => $name,
-						'path' => $path,
+						'byte' => '',
+						'date' => date ( "Y-m-d h:i A", $stamp ), // $listline ['mtime'],
 						'modified' => $stamp,
 						'raw' => $listline ['raw'] 
 				);
 			} else {
 				$files_list [] = array (
+						'name' => $name,
+						'path' => $path,
+						'ext' => $ext,
 						'item' => $item,
 						'icon' => $icon,
 						'type' => $type,
@@ -228,12 +234,9 @@ class FtpLibrary {
 						'group' => $listline ['group'],
 						'size' => $listline ['size'],
 						'byte' => $byte,
-						'date' => $listline ['mtime'],
-						'name' => $name,
-						'path' => $path,
+						'date' => date ( "Y-m-d h:i A", $stamp ), // $listline ['mtime'],
 						'modified' => $stamp,
-						'ext' => $ext,
-						// 'base64' => base64_encode ( $listline ['dirfilename'] ),
+						'base64' => base64_encode ( $name ),
 						'raw' => $listline ['raw'] 
 				);
 			}
@@ -277,6 +280,80 @@ class FtpLibrary {
 		
 		return $folderContents;
 	}
+	public function findFiles($searchTerm, $sortBy = 'name', $filter = null) {
+		$words = explode ( ' ', lower ( $searchTerm ) );
+
+		$findInFolder = function ($folder) use(&$findInFolder, $words, &$result, $sortBy, $filter) {
+			$folderContents = $this->listFolderContents ( $folder, $sortBy, $filter );
+			
+			foreach ( $folderContents as $item ) {
+				if ($item->type == FtpLibraryItem::TYPE_FOLDER)
+					$findInFolder ( $item->path );
+				else if ($this->pathMatchesSearch ( $item->path, $words ))
+					$result [] = $item;
+			}
+		};
+
+		$this->sortItemList ( $result, $sortBy );
+		return $result;
+	}
+	public	function deleteFiles($paths) {
+		try {
+			foreach ( $paths as $path ) {
+				$path = self::validatePath ( $path );
+				$this->ftp->delete ( $path );
+			}
+		} catch ( Exception $e ) {
+			throw new FtpException ( $e->getMessage () );
+			return false;
+		}
+		return true;
+	}
+	public function deleteFolder($path) {
+		$path = self::validatePath ( $path );
+		
+		try {
+			$this->ftp->deleteRecursive ( $path );
+		} catch ( Exception $e ) {
+			throw new FtpException ( $e->getMessage () );
+			return false;
+		}
+		return true;
+	}
+	public function exists($path) {
+		$path = self::validatePath ( $path );
+		
+		return $this->ftp->fileExists ( $path );
+	}
+	public function folderExists($path) {
+		$path = self::validatePath ( $path );
+		
+		return $this->ftp->isDir ( $path );
+	}	
+	public function listAllDirectories($exclude = []) {
+	}	
+	public function get($path) {
+		$path = self::validatePath ( $path );
+		return $this->ftp->get($path);
+	}
+	public function put($path, $contents) {
+		$path = self::validatePath ( $path );
+		return $this->ftp->put($path, $contents);
+	}	
+	public function moveFile($oldPath, $newPath, $isRename = false) {
+		$oldPath = self::validatePath ( $oldPath );
+		$newPath = self::validatePath ( $newPath );
+	}
+	public function copyFolder($oldPath, $newPath) {
+		$path = self::validatePath ( $path );
+	}
+	public function moveFolder($originalPath, $newPath) {
+	}
+	public function makeFolder($path) {
+		$path = self::validatePath ( $path );
+	}
+	public function resetCache() {
+	}
 	public static function validatePath($path, $normalizeOnly = false) {
 		$path = str_replace ( '\\', '/', $path );
 		$path = '/' . trim ( $path, '/' );
@@ -292,6 +369,23 @@ class FtpLibrary {
 		
 		return $path;
 	}
+	public static function url($file) {
+	}
+	public function getPathUrl($path) {
+	}
+	protected function getMediaPath($path) {
+	}
+	protected function getMediaRelativePath($path) {
+		$path = self::validatePath ( $path, true );
+	}
+	protected function isVisible($path) {
+	}
+	protected function initLibraryItem($path, $itemType) {
+	}
+	protected function getFolderItemCount($path) {
+	}
+	protected function scanFolderContents($fullFolderPath) {
+	}
 	protected function sortItemList(&$itemList, $sortBy) {
 		$files = [ ];
 		$folders = [ ];
@@ -299,13 +393,13 @@ class FtpLibrary {
 		usort ( $itemList, function ($a, $b) use($sortBy) {
 			switch ($sortBy) {
 				case self::SORT_BY_NAME :
-					return strcasecmp ( $a[$sortBy], $b[$sortBy] );
+					return strcasecmp ( $a [$sortBy], $b [$sortBy] );
 				case self::SORT_BY_SIZE :
 				case self::SORT_BY_MODIFIED :
-					if ($a[$sortBy]> $b[$sortBy])
+					if ($a [$sortBy] > $b [$sortBy])
 						return - 1;
 					
-					return ($a[$sortBy]<$b[$sortBy] )? 1 : 0;
+					return ($a [$sortBy] < $b [$sortBy]) ? 1 : 0;
 					break;
 			}
 		} );
@@ -316,7 +410,7 @@ class FtpLibrary {
 		
 		$result = [ ];
 		foreach ( $itemList as $item ) {
-			if ($item->getFileType () == $filter)
+			if ($item['type'] == $filter)
 				$result [] = $item;
 		}
 		
