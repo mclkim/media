@@ -13,18 +13,17 @@ class FtpManager extends FtpLibrary {
 	const FILTER_EVERYTHING = 'everything';
 	public function prepareVars() {
 		$folder = $this->getCurrentFolder ();
-		$folder = $this->getCurrentFolder ();
 		$viewMode = $this->getViewMode ();
 		$filter = $this->getFilter ();
 		$sortBy = $this->getSortBy ();
 		$searchTerm = $this->getSearchTerm ();
-		$searchMode = strlen ( $searchTerm ) > 0;		
-
-if (! $searchMode)
-		$items = $this->listFolderItems ( $folder, $filter, $sortBy );
-else				
-		$items = $this->findFiles ( $searchTerm, $filter, $sortBy );
-
+		$searchMode = strlen ( $searchTerm ) > 0;
+		
+		if (! $searchMode)
+			$items = $this->listFolderItems ( $folder, $filter, $sortBy );
+		else
+			$items = $this->findFiles ( $searchTerm, $filter, $sortBy );
+		
 		$breadcrumb = $this->breadcrumb ( $folder );
 		
 		// logger ( 'prepareVars' );
@@ -34,18 +33,17 @@ else
 		return array (
 				'currentFolder' => $folder,
 				'isRootFolder' => $folder == self::FOLDER_ROOT,
-				'pathSegments' => null ,
-'viewMode' => $viewMode ,
-'thumbnailParams' => null ,
-'currentFilter' => $filter ,
-'sortBy' => $sortBy ,
-'searchMode' => $searchMode ,
-'searchTerm' => $searchTerm ,
-'sidebarVisible' => null ,
-
+				'pathSegments' => null,
+				'viewMode' => $viewMode,
+				'thumbnailParams' => null,
+				'currentFilter' => $filter,
+				'sortBy' => $sortBy,
+				'searchMode' => $searchMode,
+				'searchTerm' => $searchTerm,
+				'sidebarVisible' => null,
+				
 				'items' => $items,
 				'breadcrumb' => $breadcrumb,
-				
 		);
 	}
 	public function listFolderItems($folder, $filter, $sortBy) {
@@ -53,17 +51,17 @@ else
 		
 		return $this->listFolderContents ( $folder, $sortBy, $filter );
 	}
-	public function findFiles($searchTerm, $filter, $sortBy) {
-		$filter = $filter !== self::FILTER_EVERYTHING ? $filter : null;
+// 	public function findFiles($searchTerm, $filter, $sortBy) {
+// 		$filter = $filter !== self::FILTER_EVERYTHING ? $filter : null;
 		
-		return $this->findFiles ( $searchTerm, $sortBy, $filter );
-	}
+// 		return $this->findFiles ( $searchTerm, $sortBy, $filter );
+// 	}
 	public function setCurrentFolder($folder) {
 		$folder = self::validatePath ( $folder );
 		
 		$_SESSION ['current_folder'] = $folder;
 	}
-	public function getCurrentFolder() {
+	protected function getCurrentFolder() {
 		return if_exists ( $_SESSION, 'current_folder', self::FOLDER_ROOT );
 	}
 	public function setFilter($filter) {
@@ -79,20 +77,20 @@ else
 		
 		$_SESSION ['media_filter'] = $filter;
 	}
-	public function getFilter() {
+	protected function getFilter() {
 		return if_exists ( $_SESSION, 'media_filter', self::FILTER_EVERYTHING );
 	}
-	protected function setSearchTerm($searchTerm) {
+	public function setSearchTerm($searchTerm) {
 		$_SESSION ['Search_Term'] = trim ( $searchTerm );
 	}
 	protected function getSearchTerm() {
 		return if_exists ( $_SESSION, 'Search_Term', null );
 	}
-	protected function setSortBy($sortBy) {
+	public function setSortBy($sortBy) {
 		if (! in_array ( $sortBy, [ 
-				MediaLibrary::SORT_BY_NAME,
-				MediaLibrary::SORT_BY_SIZE,
-				MediaLibrary::SORT_BY_MODIFIED 
+				self::SORT_BY_NAME,
+				self::SORT_BY_SIZE,
+				self::SORT_BY_MODIFIED 
 		] )) {
 			throw new ApplicationException ( 'Invalid input data' );
 		}
@@ -110,7 +108,7 @@ else
 	}
 	protected function getSidebarVisible() {
 	}
-	protected function setViewMode($viewMode) {
+	public function setViewMode($viewMode) {
 		if (! in_array ( $viewMode, [ 
 				self::VIEW_MODE_GRID,
 				self::VIEW_MODE_LIST,
@@ -118,12 +116,12 @@ else
 		] ))
 			throw new ApplicationException ( 'Invalid input data' );
 		
-		$_SESSION ['view_mode'] = $viewMode ;
+		$_SESSION ['view_mode'] = $viewMode;
 	}
 	protected function getViewMode() {
 		return if_exists ( $_SESSION, 'view_mode', self::VIEW_MODE_GRID );
 	}
-	public function breadcrumb($path) {
+	protected function breadcrumb($path) {
 		$path = self::validatePath ( $path, true );
 		$path = explode ( '/', ltrim ( $path, '/' ) );
 		

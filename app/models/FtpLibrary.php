@@ -7,6 +7,7 @@ class FtpLibrary {
 	const SORT_BY_SIZE = 'size';
 	const SORT_BY_MODIFIED = 'modified';
 	protected $ftp = null;
+	static $path = null;
 	function __construct($ftp) {
 		$this->ftp = $ftp;
 	}
@@ -162,8 +163,9 @@ class FtpLibrary {
 		try {
 			// $list = $this->ftp->rawlist ( $directory );
 			// $options = $recursive ? '-alnR' : '-aln';
-			$options = '-rtla';
-			$list = $this->ftp->rawlist ( $options . ' ' . $directory );
+			// $options = '-rtla';
+			// $list = $this->ftp->rawlist ( $options . ' ' . $directory );
+			$list = $this->ftp->rawlist ( $directory, $recursive );
 		} catch ( Exception $e ) {
 			throw new FtpException ( $e->getMessage () );
 			return false;
@@ -182,11 +184,11 @@ class FtpLibrary {
 		foreach ( $list as $line ) {
 			$listline = $this->parseScanLine ( $line );
 			
-			if ($listline == "") {
+			if ($listline ['raw'] == "") {
 				continue;
 			}
 			
-			$isdir = ($listline ['dirorfile'] === 'd');
+			$isdir = ($listline ['dirorfile'] === 'd' || $listline ['dirfilename'] === $listline ['raw']);
 			$item = ($isdir) ? 'folder' : 'file';
 			
 			// TODO::시간변환작업을 해야 하나??
@@ -200,6 +202,7 @@ class FtpLibrary {
 			
 			$name = $listline ['dirfilename'];
 			$path = rtrim ( $directory, '/' ); // TODO::경로를 다른 방법으로 처리
+			
 			$type = FtpLibraryItem::getInstance ()->getFileType ( $item, $ext );
 			$icon = FtpLibraryItem::getInstance ()->itemTypeToIconClass ( $item, $type );
 			$byte = FtpLibraryItem::getInstance ()->byteconvert ( $listline ['size'] );
@@ -207,7 +210,7 @@ class FtpLibrary {
 			if ($isdir) {
 				$folders_list [] = array (
 						'name' => $name,
-						'path' => $path,
+						'path' => $path ? $path : self::$path,
 						'item' => $item,
 						'icon' => $icon,
 						'type' => $type,
@@ -224,7 +227,7 @@ class FtpLibrary {
 			} else {
 				$files_list [] = array (
 						'name' => $name,
-						'path' => $path,
+						'path' => $path ? $path : self::$path,
 						'ext' => $ext,
 						'item' => $item,
 						'icon' => $icon,
@@ -282,7 +285,7 @@ class FtpLibrary {
 	}
 	public function findFiles($searchTerm, $sortBy = 'name', $filter = null) {
 		$words = explode ( ' ', lower ( $searchTerm ) );
-
+		
 		$findInFolder = function ($folder) use(&$findInFolder, $words, &$result, $sortBy, $filter) {
 			$folderContents = $this->listFolderContents ( $folder, $sortBy, $filter );
 			
@@ -293,11 +296,11 @@ class FtpLibrary {
 					$result [] = $item;
 			}
 		};
-
+		
 		$this->sortItemList ( $result, $sortBy );
 		return $result;
 	}
-	public	function deleteFiles($paths) {
+	public function deleteFiles($paths) {
 		try {
 			foreach ( $paths as $path ) {
 				$path = self::validatePath ( $path );
@@ -329,25 +332,41 @@ class FtpLibrary {
 		$path = self::validatePath ( $path );
 		
 		return $this->ftp->isDir ( $path );
-	}	
+	}
 	public function listAllDirectories($exclude = []) {
-	}	
+		$list = $this->ftp->rawlist ( '/', true );
+		$list = array_unique ( $list, SORT_LOCALE_STRING );
+		
+		$result = [ ];
+
+		foreach ( $list as $line ) {
+			if ($line == "")
+				continue;
+			
+			if ($line [0] === '/' && $line [strlen ( $line ) - 1] === ':')
+				$result [] = rtrim ( $line, ':' );
+		}
+				
+		return $result;
+	}
 	public function get($path) {
 		$path = self::validatePath ( $path );
-		return $this->ftp->get($path);
+		return $this->ftp->get ( $path );
 	}
 	public function put($path, $contents) {
 		$path = self::validatePath ( $path );
-		return $this->ftp->put($path, $contents);
-	}	
-	public function moveFile($oldPath, $newPath, $isRename = false) {
-		$oldPath = self::validatePath ( $oldPath );
+		return $this->ftp->put ( $path, $contents );
+	}
+	public function moveFile($originalPath, $newPath, $isRename = false) {
+		$oldPath = self::validatePath ( $originalPath );
 		$newPath = self::validatePath ( $newPath );
+		return $this->ftp->rename ( $oldPath, $newPath );
 	}
 	public function copyFolder($oldPath, $newPath) {
 		$path = self::validatePath ( $path );
 	}
 	public function moveFolder($originalPath, $newPath) {
+		return $this->moveFile ( $originalPath, $newPath );		
 	}
 	public function makeFolder($path) {
 		$path = self::validatePath ( $path );
@@ -410,7 +429,7 @@ class FtpLibrary {
 		
 		$result = [ ];
 		foreach ( $itemList as $item ) {
-			if ($item['type'] == $filter)
+			if ($item ['type'] == $filter)
 				$result [] = $item;
 		}
 		

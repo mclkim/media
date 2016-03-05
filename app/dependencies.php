@@ -21,6 +21,7 @@ $container ['config'] = function ($c) {
 // www.xtac.net
 $container ['template'] = function ($c) {
 	$tpl = new \Template_ ();
+	$tpl->caching = false;
 	return $tpl;
 };
 

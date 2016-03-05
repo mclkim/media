@@ -1,0 +1,32 @@
+
+<div id="MediaManager-manager-filters">
+	<h3 class="section">범주</h3>
+	<ul class="nav nav-stacked selector-group">
+		<li role="presentation"
+			class="{? currentFilter == 'everything'}active{/}"><a href="#"
+			data-command="set-filter" data-filter="everything"> <i
+				class="icon-recycle"></i> 모든 파일
+		</a></li>
+		<li role="presentation" class="{? currentFilter == 'image'}active{/}">
+			<a href="#" data-command="set-filter" data-filter="image"> <i
+				class="icon-picture-o"></i> 이미지
+		</a>
+		</li>
+		<li role="presentation" class="{? currentFilter == 'video'}active{/}">
+			<a href="#" data-command="set-filter" data-filter="video"> <i
+				class="icon-video-camera"></i> 비디오
+		</a>
+		</li>
+		<li role="presentation" class="{? currentFilter == 'audio'}active{/}">
+			<a href="#" data-command="set-filter" data-filter="audio"> <i
+				class="icon-volume-up"></i> 오디오
+		</a>
+		</li>
+		<li role="presentation"
+			class="{? currentFilter == 'document'}active{/}"><a href="#"
+			data-command="set-filter" data-filter="document"> <i
+				class="icon-file"></i> 문서
+		</a></li>
+	</ul>
+</div>
+

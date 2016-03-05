@@ -1,0 +1,21 @@
+
+<h3 class="section">정렬순서</h3>
+
+<select name="sorting" class="form-control custom-select"
+	data-control="sorting">
+	<!--{? sortBy == 'name'}-->
+	<option selected="selected" value="name">제목</option>
+	<!--{:}-->
+	<option value="name">제목</option>
+	<!--{/}-->
+	<!--{? sortBy == 'size'}-->
+	<option selected="selected" value="size">크기</option>
+	<!--{:}-->
+	<option value="size">크기</option>
+	<!--{/}-->
+	<!--{? sortBy == 'modified'}-->
+	<option selected="selected" value="modified">최종 수정</option>
+	<!--{:}-->
+	<option value="modified">최종 수정</option>
+	<!--{/}-->
+</select>

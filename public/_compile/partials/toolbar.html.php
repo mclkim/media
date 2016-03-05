@@ -1,4 +1,4 @@
-<?php /* Template_ 2.2.8 2016/03/01 11:16:30 D:\phpdev\workspace\media\public\_template\partials\toolbar.html 000002049 */ ?>
+<?php /* Template_ 2.2.8 2016/03/05 12:31:24 D:\phpdev\workspace\media\public\_template\partials\toolbar.html 000001715 */ ?>
 <div class="layout-row min-size">
 	<div class="control-toolbar toolbar-padded">
 		<div class="toolbar-item toolbar-primary">
@@ -25,15 +25,11 @@
 
 				<div class="btn-group offset-right"
 					id="MediaManager-manager-view-mode-buttons">
-					<button type="button"
-						class="btn btn-default oc-icon-align-justify empty on"
-						data-command="change-view" data-view="grid"></button>
-					<button type="button" class="btn btn-default oc-icon-th empty "
-						data-command="change-view" data-view="list"></button>
-					<button type="button"
-						class="btn btn-default oc-icon-th-large empty "
-						data-command="change-view" data-view="tiles"></button>
+					<!-- view_mode_buttons -->
+<?php $this->print_("view_mode_buttons",$TPL_SCP,1);?>
+
 				</div>
+
 			</div>
 		</div>
 		<div class="toolbar-item" data-calculate-width>

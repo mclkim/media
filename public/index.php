@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL & ~E_NOTICE);
 /**
  * |-------------------------------------------------------------------
  * |주 경로 상수를 설정
@@ -13,7 +14,10 @@ define ( 'BASE_PATH', dirname ( ROOT_PATH ) );
  * |---------------------------------------------------------------
  */
 date_default_timezone_set ( 'Asia/Seoul' ); // 한국시간(timezone)설정
-
+/**
+ * 파일명 언어와 인코딩에 대해 재정의해 주어야 한다.
+ */
+setlocale ( LC_ALL, 'ko_KR.utf8' );
 /**
  * |--------------------------------------------------------------------------
  * | Register Core Helpers
@@ -37,11 +41,10 @@ if (! file_exists ( $helperPath )) {
  */
 $loader = require_once BASE_PATH . '/vendor/autoload.php';
 // Application Controller
-$loader->addPsr4 ( 'App\\', BASE_PATH . '/app' ); 
+$loader->addPsr4 ( 'App\\', BASE_PATH . '/app' );
 $loader->addClassMap ( [ 
 		'PluploadHandler' => BASE_PATH . '/vendor/mclkim/kaiser/src/Plupload/PluploadHandler.php' 
-]
- );
+] );
 /**
  * |-------------------------------------------------------------------
  * |Set up dependencies

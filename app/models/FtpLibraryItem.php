@@ -62,17 +62,17 @@ class FtpLibraryItem extends Singleton {
 	 *      - cms.storage.media.audo_extensions
 	 */
 	protected static $defaultTypeExtensions = [ 
-			'audio' => [
+			'audio' => [ 
 					'mp3',
 					'wav',
 					'wma',
 					'm4a',
-					'ogg'
+					'ogg' 
 			],
-			'compressed' => [
+			'compressed' => [ 
 					'zip',
 					'tar',
-					'gz',
+					'gz' 
 			],
 			'image' => [ 
 					'gif',
@@ -89,8 +89,7 @@ class FtpLibraryItem extends Singleton {
 					'mpeg',
 					'mkv',
 					'webm' 
-			],
-
+			] 
 	];
 	protected static $imageExtensions;
 	protected static $videoExtensions;
@@ -105,13 +104,13 @@ class FtpLibraryItem extends Singleton {
 	 * @param string $type        	
 	 * @param string $publicUrl        	
 	 */
-	// public function __construct($path, $size, $lastModified, $type, $publicUrl) {
-	// $this->path = $path;
-	// $this->size = $size;
-	// $this->lastModified = $lastModified;
-	// $this->type = $type;
-	// $this->publicUrl = $publicUrl;
-	// }
+// 	public function __construct($path, $size, $lastModified, $type, $publicUrl) {
+// 		$this->path = $path;
+// 		$this->size = $size;
+// 		$this->lastModified = $lastModified;
+// 		$this->type = $type;
+// 		$this->publicUrl = $publicUrl;
+// 	}
 	
 	/**
 	 *
@@ -131,7 +130,6 @@ class FtpLibraryItem extends Singleton {
 		// if (! $this->isFile ()) {
 		// return null;
 		// }
-		
 		if ($item == FtpLibraryItem::TYPE_FOLDER)
 			return null;
 		
@@ -205,7 +203,7 @@ class FtpLibraryItem extends Singleton {
 	public function byteconvert($bytes) {
 		if (empty ( $bytes ) || $bytes < 0)
 			return '0 B';
-
+		
 		$symbol = array (
 				'B',
 				'KB',
@@ -230,5 +228,13 @@ class FtpLibraryItem extends Singleton {
 		$chmod = substr ( strtr ( $chmod, $trans ), 1 );
 		$array = str_split ( $chmod, 3 );
 		return array_sum ( str_split ( $array [0] ) ) . array_sum ( str_split ( $array [1] ) ) . array_sum ( str_split ( $array [2] ) );
+	}
+	/* getbasename function : 한글파일이 잘려서 나타나는 문제 (ex> 안녕.ppt --> .ppt) 모든 basename() 함수를 getbasename()으로 대체 */
+	/* 출처 : http://dev.tattertools.com/changeset/7 */
+	public function getbasename($path) {
+		$pattern = (strncasecmp ( PHP_OS, 'WIN', 3 ) ? '/([^\/]+)[\/]*$/' : '/([^\/\\\\]+)[\/\\\\]*$/');
+		if (preg_match ( $pattern, $path, $matches ))
+			return $matches [1];
+		return '';
 	}
 }

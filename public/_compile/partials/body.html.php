@@ -1,4 +1,4 @@
-<?php /* Template_ 2.2.8 2016/02/04 10:56:23 D:\phpdev\workspace\media\public\_template\partials\body.html 000002987 */ ?>
+<?php /* Template_ 2.2.8 2016/03/04 17:49:24 D:\phpdev\workspace\media\public\_template\partials\body.html 000002918 */ ?>
 <form method="POST" action="http://localhost/media/public/"
 	accept-charset="UTF-8" class="layout" onsubmit="return false">
 	<!-- _token -->
@@ -53,9 +53,7 @@
 													<div class="scroll-wrapper">
 														<!-- This element is required for the scrollpad control -->
 														<div id="MediaManager-manager-item-list">
-<?php $this->print_("item_list",$TPL_SCP,1);?>
-
-														</div>
+<?php $this->print_("item_list",$TPL_SCP,1);?></div>
 													</div>
 												</div>
 											</div>
@@ -85,10 +83,9 @@
 				</div>
 			</div>
 		</div>
-
-		<script type="text/template" data-control="new-folder-template">
+		
+		<!-- New Folder Form -->
 <?php $this->print_("new_folder_form",$TPL_SCP,1);?>
 
-		</script>
 	</div>
 </form>

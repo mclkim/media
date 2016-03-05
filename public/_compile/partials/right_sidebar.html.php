@@ -1,4 +1,4 @@
-<?php /* Template_ 2.2.8 2016/02/04 10:56:23 D:\phpdev\workspace\media\public\_template\partials\right_sidebar.html 000002829 */ ?>
+<?php /* Template_ 2.2.8 2016/03/03 04:42:57 D:\phpdev\workspace\media\public\_template\partials\right_sidebar.html 000002829 */ ?>
 <div data-control="media-preview-container"></div>
 
 <script type="text/template" data-control="audio-template">

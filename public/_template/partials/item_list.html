@@ -1,17 +1,18 @@
 
 <div class="panel no-padding padding-top">
 	<input type="hidden" data-type="current-folder" value="{currentFolder}" />
-	<input type="hidden" data-type="search-mode" value="{?searchMode}'true'{:}'false'{/}" />
+	<input type="hidden" data-type="search-mode"
+		value="{?searchMode}'true'{:}'false'{/}" />
 	<div class="list-container">
-
+		<!-- {?viewMode == 'grid'} -->
 		<table class="table data">
 			<col />
 			<col width="130px" />
 			<col width="130px" />
 
 			<tbody class="icons clickable">
-				<!-- {?!isRootFolder} -->
-				<tr data-type="media-item" data-item-type="folder" data-root
+				<!-- {?!isRootFolder && !searchMode} -->
+				<tr data-type="media-item" data-item-type="folder" data-root=""
 					data-path="{=dirname(currentFolder)}" tabindex="0">
 					<td><i class="icon-folder"></i>..</td>
 					<td></td>
@@ -20,11 +21,10 @@
 				<!-- {/} -->
 				<!-- {@items} -->
 				<tr data-type="media-item" data-item-type="{.item}"
-					data-path="{.path}/{.name}" data-title="{.name}" data-size="{.byte}"
-					data-last-modified="{.date}" data-last-modified-ts="{=date("Y-m-d h:i A",.modified)}"
-					data-public-url=""
-					data-document-type="{.type}" data-folder="{.path}"
-					tabindex="0">
+					data-path="{.path}/{.name}" data-title="{.name}"
+					data-size="{.byte}" data-last-modified="{.date}"
+					data-last-modified-ts="{.date}" data-public-url=""
+					data-document-type="{.type}" data-folder="{.path}" tabindex="0">
 					<td>
 						<div class="item-title no-wrap-text">
 							<i class="{.icon}"></i> {.name} <a href="#" data-rename
@@ -37,9 +37,53 @@
 					<td>{.byte}</td>
 					<td>{=date("y-m-d h:i A",.modified)}</td>
 				</tr>
+				<!-- {:} -->
+				<p class="no-data">요청한 파일을 찾을수 없습니다.</p>
 				<!-- {/} -->
 			</tbody>
 		</table>
+		<!-- {:} -->
+		<ul class="media-list {viewMode}">
+			<!-- {?!isRootFolder && !searchMode} -->
+			<li tabindex="0" data-type="media-item" data-item-type="folder"
+				data-root="" data-path="{=dirname(currentFolder)}">
+				<div class="icon-container folder">
+					<div class="icon-wrapper">
+						<i class="icon-folder"></i>
+					</div>
+				</div>
+				<div class="info">
+					<h4 title="상위 폴더로 돌아 가기">상위 폴더...</h4>
+				</div>
+			</li>
+			<!-- {/} -->
+			<!-- {@items} -->
+			<li data-type="media-item" data-item-type="{.item}"
+				data-path="{.path}/{.name}" data-title="{.name}" data-size="{.byte}"
+				data-last-modified="{.date}" data-last-modified-ts="{.date}"
+				data-public-url="" data-document-type="{.type}"
+				data-folder="{.path}" tabindex="0">
+				<div class="icon-container">
+					<div class="icon-wrapper">
+						<i class="{.icon}"></i>
+					</div>
 
+				</div>
+				<div class="info">
+					<h4 title="{.name}">
+						{.name} <a href="#" data-rename="" data-control="popup"
+							data-z-index="1200"
+							data-request-data="path: '{.path}/{.name}', listId: 'MediaManager-manager-item-list', type: '{.item}'"
+							data-handler="manager::onLoadRenamePopup"><i
+							data-rename-control="" class="icon-terminal"></i></a>
+					</h4>
+					<p class="size">{.byte}</p>
+				</div>
+			</li>
+			<!-- {:} -->
+			<li class="no-data">요청한 파일을 찾을수 없습니다.</li>
+			<!-- {/} -->
+		</ul>
+		<!-- {/} -->
 	</div>
 </div>
