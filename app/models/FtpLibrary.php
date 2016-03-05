@@ -266,6 +266,10 @@ class FtpLibrary {
 	public function listFolderContents($folder = '/', $sortBy = 'name', $filter = null) {
 		$folder = self::validatePath ( $folder );
 		
+		/*
+		 * Try to load the contents from cache
+		 */
+		
 		$folderContents = $this->parseRawList ( $folder );
 		
 		/**
@@ -284,18 +288,21 @@ class FtpLibrary {
 		return $folderContents;
 	}
 	public function findFiles($searchTerm, $sortBy = 'name', $filter = null) {
-		$words = explode ( ' ', lower ( $searchTerm ) );
+		$words = explode ( ' ', strtolower ( $searchTerm ) );
+		$result = [ ];
 		
 		$findInFolder = function ($folder) use(&$findInFolder, $words, &$result, $sortBy, $filter) {
 			$folderContents = $this->listFolderContents ( $folder, $sortBy, $filter );
 			
 			foreach ( $folderContents as $item ) {
-				if ($item->type == FtpLibraryItem::TYPE_FOLDER)
-					$findInFolder ( $item->path );
-				else if ($this->pathMatchesSearch ( $item->path, $words ))
+				if ($item ['type'] == FtpLibraryItem::TYPE_FOLDER)
+					$findInFolder ( $item ['path'] );
+				else if ($this->pathMatchesSearch ( $item ['path'], $words ))
 					$result [] = $item;
 			}
 		};
+		
+		$findInFolder ( '/' );
 		
 		$this->sortItemList ( $result, $sortBy );
 		return $result;
@@ -338,7 +345,7 @@ class FtpLibrary {
 		$list = array_unique ( $list, SORT_LOCALE_STRING );
 		
 		$result = [ ];
-
+		
 		foreach ( $list as $line ) {
 			if ($line == "")
 				continue;
@@ -346,7 +353,7 @@ class FtpLibrary {
 			if ($line [0] === '/' && $line [strlen ( $line ) - 1] === ':')
 				$result [] = rtrim ( $line, ':' );
 		}
-				
+		
 		return $result;
 	}
 	public function get($path) {
@@ -366,10 +373,39 @@ class FtpLibrary {
 		$path = self::validatePath ( $path );
 	}
 	public function moveFolder($originalPath, $newPath) {
-		return $this->moveFile ( $originalPath, $newPath );		
+		return $this->moveFile ( $originalPath, $newPath );
 	}
 	public function makeFolder($path) {
 		$path = self::validatePath ( $path );
+		
+		try {
+			if ($this->ftp->isDir ( $path ) == false)
+				$this->ftp->mkdir ( $path );
+		} catch ( Exception $e ) {
+			throw new FtpException ( $e->getMessage () );
+			return false;
+		}
+		return true;
+	}
+	public function uploadFile($path = '/', $file, $mode = 'auto') {
+		$path = self::validatePath ( $path );
+		
+		// Set the mode if not specified
+		if ($mode === 'auto') {
+			$extension = pathinfo ( $file ['name'], PATHINFO_EXTENSION ) ?  : 'unknown';
+			// Get the file extension so we can set the upload type
+			$mode = FtpLibraryItem::getInstance ()->getFileMode ( $extension );
+		}
+		
+		try {
+			$this->ftp->chdir ( $path );
+			$mode = ($mode === 'ascii') ? FTP_ASCII : FTP_BINARY;
+			$this->ftp->put ( $file ['name'], $file ['tmp_name'], $mode );
+		} catch ( Exception $e ) {
+			throw new FtpException ( $e->getMessage () );
+			return false;
+		}
+		return true;
 	}
 	public function resetCache() {
 	}
@@ -434,5 +470,9 @@ class FtpLibrary {
 		}
 		
 		$itemList = $result;
+	}
+	protected function getStorageDisk() {
+	}
+	protected function pathMatchesSearch($path, $words) {
 	}
 }

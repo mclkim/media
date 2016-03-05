@@ -2,10 +2,10 @@
 	<li class="root"><a href="#" data-type="media-item"
 		data-item-type="folder" data-path="/" data-clear-search="true">Home</a></li>
 <!--{?!searchMode}-->		
-<!--{@breadcrumb}-->		
-<!--{?.dir != ''}-->		
+<!--{@pathSegments}-->		
+<!--{?.value_ != ''}-->		
 	<li><a href="#" data-type="media-item" data-item-type="folder"
-		data-path="{.dir}">{.content}</a></li>
+		data-path="{.value_}">{.key_}</a></li>
 <!--{/}-->
 <!--{/}-->
 <!--{:}-->

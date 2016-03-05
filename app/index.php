@@ -8,6 +8,7 @@ class index extends Controller {
 		return false;
 	}
 	function execute() {
+		$this->debug($_SESSION);
 		$ftp = $this->container->get ( 'ftp' );
 		
 		$model = new \App\Models\FtpManager ( $ftp );

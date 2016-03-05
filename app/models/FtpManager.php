@@ -24,16 +24,11 @@ class FtpManager extends FtpLibrary {
 		else
 			$items = $this->findFiles ( $searchTerm, $filter, $sortBy );
 		
-		$breadcrumb = $this->breadcrumb ( $folder );
-		
-		// logger ( 'prepareVars' );
-		// logger ( $folder, $items );
-		// logger ( '', $breadcrumb );
-		
 		return array (
+				'items' => $items ,
 				'currentFolder' => $folder,
 				'isRootFolder' => $folder == self::FOLDER_ROOT,
-				'pathSegments' => null,
+				'pathSegments' => $this->splitPathToSegments ( $folder ),
 				'viewMode' => $viewMode,
 				'thumbnailParams' => null,
 				'currentFilter' => $filter,
@@ -41,21 +36,18 @@ class FtpManager extends FtpLibrary {
 				'searchMode' => $searchMode,
 				'searchTerm' => $searchTerm,
 				'sidebarVisible' => null,
-				
-				'items' => $items,
-				'breadcrumb' => $breadcrumb,
 		);
 	}
-	public function listFolderItems($folder, $filter, $sortBy) {
+	protected function listFolderItems($folder, $filter, $sortBy) {
 		$filter = $filter !== self::FILTER_EVERYTHING ? $filter : null;
 		
 		return $this->listFolderContents ( $folder, $sortBy, $filter );
 	}
-// 	public function findFiles($searchTerm, $filter, $sortBy) {
-// 		$filter = $filter !== self::FILTER_EVERYTHING ? $filter : null;
-		
-// 		return $this->findFiles ( $searchTerm, $sortBy, $filter );
-// 	}
+	protected function findItems($searchTerm, $filter, $sortBy) {
+	$filter = $filter !== self::FILTER_EVERYTHING ? $filter : null;
+	
+	return $this->findFiles ( $searchTerm, $sortBy, $filter );
+	}
 	public function setCurrentFolder($folder) {
 		$folder = self::validatePath ( $folder );
 		
@@ -81,10 +73,10 @@ class FtpManager extends FtpLibrary {
 		return if_exists ( $_SESSION, 'media_filter', self::FILTER_EVERYTHING );
 	}
 	public function setSearchTerm($searchTerm) {
-		$_SESSION ['Search_Term'] = trim ( $searchTerm );
+		$_SESSION ['search_term'] = trim ( $searchTerm );
 	}
 	protected function getSearchTerm() {
-		return if_exists ( $_SESSION, 'Search_Term', null );
+		return if_exists ( $_SESSION, 'search_term', null );
 	}
 	public function setSortBy($sortBy) {
 		if (! in_array ( $sortBy, [ 
@@ -102,11 +94,13 @@ class FtpManager extends FtpLibrary {
 	}
 	protected function getSelectionParams() {
 	}
-	protected function setSelectionParams($selectionMode, $selectionWidth, $selectionHeight) {
+	public function setSelectionParams($selectionMode, $selectionWidth, $selectionHeight) {
 	}
-	protected function setSidebarVisible($visible) {
+	public function setSidebarVisible($visible) {
+		$_SESSION ['sidebar_visible'] = ! ! $visible;		
 	}
 	protected function getSidebarVisible() {
+		return if_exists ( $_SESSION, 'sidebar_visible', true );
 	}
 	public function setViewMode($viewMode) {
 		if (! in_array ( $viewMode, [ 
@@ -121,71 +115,20 @@ class FtpManager extends FtpLibrary {
 	protected function getViewMode() {
 		return if_exists ( $_SESSION, 'view_mode', self::VIEW_MODE_GRID );
 	}
-	protected function breadcrumb($path) {
+	protected function splitPathToSegments($path) {
 		$path = self::validatePath ( $path, true );
 		$path = explode ( '/', ltrim ( $path, '/' ) );
 		
-		$parent = '';
-		foreach ( $path as $dir ) {
-			$chunks [] = array (
-					'dir' => $dir,
-					'path' => $parent,
-					'content' => $dir == '' ? 'Home' : $dir 
-			);
-			$parent = rtrim ( $parent, '/' ) . '/' . ltrim ( $dir, '/' );
+		$result = [ ];
+		while ( count ( $path ) > 0 ) {
+			$folder = array_pop ( $path );
+			
+			$result [$folder] = implode ( '/', $path ) . '/' . $folder;
+			if (substr ( $result [$folder], 0, 1 ) != '/')
+				$result [$folder] = '/' . $result [$folder];
 		}
-		return $chunks;
-	}
-	private function _settype($ext) {
-		$text_types = array (
-				'txt',
-				'text',
-				'php',
-				'phps',
-				'php4',
-				'js',
-				'css',
-				'htm',
-				'html',
-				'phtml',
-				'shtml',
-				'log',
-				'xml' 
-		);
-		return ( bool ) (in_array ( $ext, $text_types )) ? 'ascii' : 'binary';
-	}
-	function upload($path = '/', $file, $mode = 'auto') {
-		$path = self::validatePath ( $path );
-		
-		// Set the mode if not specified
-		if ($mode === 'auto') {
-			$extension = pathinfo ( $file ['name'], PATHINFO_EXTENSION ) ?  : 'unknown';
-			// Get the file extension so we can set the upload type
-			$mode = $this->_settype ( $extension );
-		}
-		
-		try {
-			$this->ftp->chdir ( $path );
-			$mode = ($mode === 'ascii') ? FTP_ASCII : FTP_BINARY;
-			$this->ftp->put ( $file ['name'], $file ['tmp_name'], $mode );
-		} catch ( Exception $e ) {
-			throw new FtpException ( $e->getMessage () );
-			return false;
-		}
-		return true;
-	}
-	function mkdir($path = '/', $directory) {
-		$path = self::validatePath ( $path );
-		
-		try {
-			$this->ftp->chdir ( $path );
-			if ($this->ftp->isDir ( $directory ) == false)
-				$this->ftp->mkdir ( $directory );
-		} catch ( Exception $e ) {
-			throw new FtpException ( $e->getMessage () );
-			return false;
-		}
-		return true;
+
+		return array_reverse ( $result );
 	}
 	protected function validateFileName($name) {
 		if (! preg_match ( '/^[0-9a-z\.\s_\-]+$/i', $name )) {

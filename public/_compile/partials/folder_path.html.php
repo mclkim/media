@@ -1,13 +1,13 @@
-<?php /* Template_ 2.2.8 2016/02/25 20:34:07 D:\phpdev\workspace\media\public\_template\partials\folder_path.html 000000817 */ 
-$TPL_breadcrumb_1=empty($TPL_VAR["breadcrumb"])||!is_array($TPL_VAR["breadcrumb"])?0:count($TPL_VAR["breadcrumb"]);?>
+<?php /* Template_ 2.2.8 2016/03/05 14:04:20 D:\phpdev\workspace\media\public\_template\partials\folder_path.html 000000813 */ 
+$TPL_pathSegments_1=empty($TPL_VAR["pathSegments"])||!is_array($TPL_VAR["pathSegments"])?0:count($TPL_VAR["pathSegments"]);?>
 <ul class="tree-path">
 	<li class="root"><a href="#" data-type="media-item"
 		data-item-type="folder" data-path="/" data-clear-search="true">Home</a></li>
 <?php if(!$TPL_VAR["searchMode"]){?>		
-<?php if($TPL_breadcrumb_1){foreach($TPL_VAR["breadcrumb"] as $TPL_V1){?>		
-<?php if($TPL_V1["dir"]!=''){?>		
+<?php if($TPL_pathSegments_1){foreach($TPL_VAR["pathSegments"] as $TPL_K1=>$TPL_V1){?>		
+<?php if($TPL_V1!=''){?>		
 	<li><a href="#" data-type="media-item" data-item-type="folder"
-		data-path="<?php echo $TPL_V1["dir"]?>"><?php echo $TPL_V1["content"]?></a></li>
+		data-path="<?php echo $TPL_V1?>"><?php echo $TPL_K1?></a></li>
 <?php }?>
 <?php }}?>
 <?php }else{?>

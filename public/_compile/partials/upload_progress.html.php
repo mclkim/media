@@ -1,9 +1,9 @@
-<?php /* Template_ 2.2.8 2016/02/04 10:56:23 D:\phpdev\workspace\media\public\_template\partials\upload_progress.html 000000982 */ ?>
+<?php /* Template_ 2.2.8 2016/03/05 12:57:17 D:\phpdev\workspace\media\public\_template\partials\upload_progress.html 000000983 */ ?>
 <div class="layout-row min-size hide" data-control="upload-ui">
 	<div class="layout">
 		<div class="upload-progress">
 			<h5 data-label="file-number-and-progress"
-				data-message-template="업로딩 :number 파일... <span>:percents</span>"
+				data-message-template="업로딩  :number 파일... <span>:percents</span>"
 				data-success-template="업로드 완료" data-error-template="업로드에 실패했습니다"></h5>
 
 			<div class="progress-controls">

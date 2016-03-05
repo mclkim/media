@@ -130,7 +130,7 @@ class FtpLibraryItem extends Singleton {
 		// if (! $this->isFile ()) {
 		// return null;
 		// }
-		if ($item == FtpLibraryItem::TYPE_FOLDER)
+		if ($item == self::TYPE_FOLDER)
 			return null;
 		
 		self::$imageExtensions = self::$defaultTypeExtensions ['image'];
@@ -186,19 +186,37 @@ class FtpLibraryItem extends Singleton {
 		return Carbon::createFromTimestamp ( $date )->toFormattedDateString ();
 	}
 	public function itemTypeToIconClass($item, $itemType) {
-		if ($item == FtpLibraryItem::TYPE_FOLDER)
+		if ($item == self::TYPE_FOLDER)
 			return 'icon-folder';
 		
 		switch ($itemType) {
-			case FtpLibraryItem::FILE_TYPE_IMAGE :
+			case self::FILE_TYPE_IMAGE :
 				return "icon-picture-o";
-			case FtpLibraryItem::FILE_TYPE_VIDEO :
+			case self::FILE_TYPE_VIDEO :
 				return "icon-video-camera";
-			case FtpLibraryItem::FILE_TYPE_AUDIO :
+			case self::FILE_TYPE_AUDIO :
 				return "icon-volume-up";
 			default :
 				return "icon-file";
 		}
+	}
+	public function getFileMode ($ext) {
+		$text_types = array (
+				'txt',
+				'text',
+				'php',
+				'phps',
+				'php4',
+				'js',
+				'css',
+				'htm',
+				'html',
+				'phtml',
+				'shtml',
+				'log',
+				'xml' 
+		);
+		return ( bool ) (in_array ( $ext, $text_types )) ? 'ascii' : 'binary';
 	}
 	public function byteconvert($bytes) {
 		if (empty ( $bytes ) || $bytes < 0)

@@ -28,10 +28,33 @@ class manager extends Controller {
 		if (($file = $upload->getFiles ()) !== false) {
 			$model = new \App\Models\FtpManager ( $ftp );
 			
-			$model->upload ( $path, $file );
+			$model->uploadFile ( $path, $file );
 		} else {
 			$this->err ( $upload->get_error_message () );
 		}
+	}
+	public function onSearch() {
+		logger ( $_POST );
+		
+		$search = $this->getParameter ( 'search' );
+		
+		$ftp = $this->container->get ( 'ftp' );
+		$model = new \App\Models\FtpManager ( $ftp );
+		
+		$model->setSearchTerm ( $search );
+		
+		$var = $model->prepareVars ();
+		
+		//
+		$tpl = $this->container->get ( 'template' );
+		$tpl->assign ( $var );
+		$tpl->define ( "item_list", "partials/item_list.html" );
+		$tpl->define ( "folder_path", "partials/folder_path.html" );
+		
+		return [ 
+				'#MediaManager-manager-item-list' => $tpl->fetch ( "item_list" ),
+				'#MediaManager-manager-folder-path' => $tpl->fetch ( "folder_path" ) 
+		];
 	}
 	function onGoToFolder() {
 		logger ( $_POST );
@@ -55,8 +78,38 @@ class manager extends Controller {
 				'#MediaManager-manager-folder-path' => $tpl->fetch ( "folder_path" ) 
 		];
 	}
+	public function onGenerateThumbnails() {
+		logger ( $_POST );
+	}
 	public function onGetSidebarThumbnail() {
 		logger ( $_POST );
+	}
+	public function onChangeView() {
+		logger ( $_POST );
+		
+		$viewMode = $this->getParameter ( 'view' );
+		$path = $this->getParameter ( 'path' );
+		
+		$ftp = $this->container->get ( 'ftp' );
+		$model = new \App\Models\FtpManager ( $ftp );
+		
+		$model->setViewMode ( $viewMode );
+		$model->setCurrentFolder ( $path );
+		
+		$var = $model->prepareVars ();
+		
+		//
+		$tpl = $this->container->get ( 'template' );
+		$tpl->assign ( $var );
+		$tpl->define ( "item_list", "partials/item_list.html" );
+		$tpl->define ( "folder_path", "partials/folder_path.html" );
+		$tpl->define ( "view_mode_buttons", "partials/view_mode_buttons.html" );
+		
+		return [ 
+				'#MediaManager-manager-item-list' => $tpl->fetch ( "item_list" ),
+				'#MediaManager-manager-folder-path' => $tpl->fetch ( "folder_path" ),
+				'#MediaManager-manager-view-mode-buttons' => $tpl->fetch ( "view_mode_buttons" ) 
+		];
 	}
 	public function onSetFilter() {
 		logger ( $_POST );
@@ -74,15 +127,38 @@ class manager extends Controller {
 		
 		//
 		$tpl = $this->container->get ( 'template' );
-		
 		$tpl->assign ( $var );
-
 		$tpl->define ( "item_list", "partials/item_list.html" );
 		$tpl->define ( "filters", "partials/filters.html" );
-
+		
 		return [ 
 				'#MediaManager-manager-item-list' => $tpl->fetch ( "item_list" ),
 				'#MediaManager-manager-filters' => $tpl->fetch ( "filters" ) 
+		];
+	}
+	public function onSetSorting() {
+		logger ( $_POST );
+		
+		$sortBy = $this->getParameter ( 'sortBy' );
+		$path = $this->getParameter ( 'path' );
+		
+		$ftp = $this->container->get ( 'ftp' );
+		$model = new \App\Models\FtpManager ( $ftp );
+		
+		$model->setSortBy ( $sortBy );
+		$model->setCurrentFolder ( $path );
+		
+		$var = $model->prepareVars ();
+		
+		//
+		$tpl = $this->container->get ( 'template' );
+		$tpl->assign ( $var );
+		$tpl->define ( "item_list", "partials/item_list.html" );
+		$tpl->define ( "folder_path", "partials/folder_path.html" );
+		
+		return [ 
+				'#MediaManager-manager-item-list' => $tpl->fetch ( "item_list" ),
+				'#MediaManager-manager-folder-path' => $tpl->fetch ( "folder_path" ) 
 		];
 	}
 	public function onDelete() {
@@ -116,7 +192,6 @@ class manager extends Controller {
 		$var = $model->prepareVars ();
 		
 		$tpl = $this->container->get ( 'template' );
-		
 		$tpl->assign ( $var );
 		$tpl->define ( "item_list", "partials/item_list.html" );
 		
@@ -124,7 +199,57 @@ class manager extends Controller {
 				'#MediaManager-manager-item-list' => $tpl->fetch ( "item_list" ) 
 		];
 	}
-	function onCreateFolder() {
+	public function onLoadRenamePopup() {
+		logger ( $_POST );
+		
+		$path = $this->getParameter ( 'path' );
+		$type = $this->getParameter ( 'type' );
+		
+		$tpl = $this->container->get ( 'template' );
+		$tpl->assign ( array (
+				'originalPath' => $path,
+				'name' => FtpLibraryItem::getInstance ()->getbasename ( $path ),
+				'type' => $type 
+		) );
+		$tpl->define ( "rename_form", "partials/rename_form.html" );
+		
+		return $tpl->fetch ( "rename_form" );
+	}
+	public function onApplyName() {
+		logger ( $_POST );
+		
+		$name = $this->getParameter ( 'name' );
+		$originalPath = $this->getParameter ( 'originalPath' );
+		
+		$newName = trim ( $name );
+		if (! strlen ( $newName )) {
+			throw new ApplicationException ( '' );
+		}
+		
+		// $originalPath = FtpLibrary::validatePath ( $originalPath );
+		$newPath = dirname ( $originalPath ) . '/' . $newName;
+		
+		$ftp = $this->container->get ( 'ftp' );
+		$model = new \App\Models\FtpManager ( $ftp );
+		
+		if ($type == FtpLibraryItem::TYPE_FILE) {
+			$model->moveFile ( $originalPath, $newPath );
+		} else {
+			$model->moveFolder ( $originalPath, $newPath );
+		}
+		
+		//
+		$var = $model->prepareVars ();
+		
+		$tpl = $this->container->get ( 'template' );
+		$tpl->assign ( $var );
+		$tpl->define ( "item_list", "partials/item_list.html" );
+		
+		return [ 
+				'#MediaManager-manager-item-list' => $tpl->fetch ( "item_list" ) 
+		];
+	}
+	public function onCreateFolder() {
 		logger ( $_POST );
 		
 		$name = $this->getParameter ( 'name' );
@@ -141,7 +266,7 @@ class manager extends Controller {
 		
 		$ftp = $this->container->get ( 'ftp' );
 		$model = new \App\Models\FtpManager ( $ftp );
-		$model->mkdir ( $path, $newFolderPath );
+		$model->makeFolder ( $newFolderPath );
 		
 		//
 		$var = $model->prepareVars ();
@@ -152,58 +277,6 @@ class manager extends Controller {
 		
 		return [ 
 				'#MediaManager-manager-item-list' => $tpl->fetch ( "item_list" ) 
-		];
-	}
-	function onSetSorting() {
-		logger ( $_POST );
-		
-		$sortBy = $this->getParameter ( 'sortBy' );
-		$path = $this->getParameter ( 'path' );
-		
-		$ftp = $this->container->get ( 'ftp' );
-		$model = new \App\Models\FtpManager ( $ftp );
-		
-		$model->setSortBy ( $sortBy );
-		$model->setCurrentFolder ( $path );
-		
-		$var = $model->prepareVars ();
-		
-		//
-		$tpl = $this->container->get ( 'template' );
-		$tpl->assign ( $var );
-		$tpl->define ( "item_list", "partials/item_list.html" );
-		$tpl->define ( "folder_path", "partials/folder_path.html" );
-		
-		return [ 
-				'#MediaManager-manager-item-list' => $tpl->fetch ( "item_list" ),
-				'#MediaManager-manager-folder-path' => $tpl->fetch ( "folder_path" ) 
-		];
-	}
-	function onChangeView() {
-		logger ( $_POST );
-		
-		$viewMode = $this->getParameter ( 'view' );
-		$path = $this->getParameter ( 'path' );
-		
-		$ftp = $this->container->get ( 'ftp' );
-		$model = new \App\Models\FtpManager ( $ftp );
-		
-		$model->setViewMode ( $viewMode );
-		$model->setCurrentFolder ( $path );
-		
-		$var = $model->prepareVars ();
-		
-		//
-		$tpl = $this->container->get ( 'template' );
-		$tpl->assign ( $var );
-		$tpl->define ( "item_list", "partials/item_list.html" );
-		$tpl->define ( "folder_path", "partials/folder_path.html" );
-		$tpl->define ( "view_mode_buttons", "partials/view_mode_buttons.html" );
-		
-		return [ 
-				'#MediaManager-manager-item-list' => $tpl->fetch ( "item_list" ),
-				'#MediaManager-manager-folder-path' => $tpl->fetch ( "folder_path" ) ,
-				'#MediaManager-manager-view-mode-buttons' => $tpl->fetch ( "view_mode_buttons" ) 
 		];
 	}
 	public function onLoadMovePopup() {
@@ -242,7 +315,7 @@ class manager extends Controller {
 		
 		return $tpl->fetch ( "move_form" );
 	}
-	function onMoveItems() {
+	public function onMoveItems() {
 		logger ( $_POST );
 		
 		$dest = $this->getParameter ( 'dest' );
@@ -270,6 +343,10 @@ class manager extends Controller {
 		return [ 
 				'#MediaManager-manager-item-list' => $tpl->fetch ( "item_list" ) 
 		];
+	}
+	public function onSetSidebarVisible() {
+	}
+	public function onLoadPopup() {
 	}
 	protected function validateFileName($name) {
 		if (! preg_match ( '/^[0-9a-z\.\s_\-]+$/i', $name )) {
