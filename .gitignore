@@ -2,9 +2,9 @@
 .idea
 .project
 .settings
-!_compile/robots.txt
 **/_compile/**
 **/_thumbnail/**
+!/_compile/robots.txt
 /config/config.php
 composer.lock
 log/**
