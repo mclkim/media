@@ -2,7 +2,7 @@
 .idea
 .project
 .settings
-!robots.txt
+!_compile/robots.txt
 **/_compile/**
 **/_thumbnail/**
 /config/config.php
