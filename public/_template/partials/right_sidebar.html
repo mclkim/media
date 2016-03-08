@@ -2,20 +2,20 @@
 
 <script type="text/template" data-control="audio-template">
     <div class="panel no-padding-bottom">
-        <audio src="{src}" controls>
+        <audio src=":src" controls>
             <div class="media-player-fallback panel-embedded">Your browser doesn't support HTML5 audio.</div>
         </audio>
     </div>
 </script>
 
 <script type="text/template" data-control="video-template">
-    <video src="{src}" controls poster="http://localhost/october/modules/cms/widgets/mediamanager/assets/images/video-poster.png">
+    <video src=":src" controls poster="{baseUrl}_template/assets/images/video-poster.png">
         <div class="panel media-player-fallback">Your browser doesn't support HTML5 video.</div>
     </video>
 </script>
 
 <script type="text/template" data-control="image-template">
-    <div class="sidebar-image-placeholder-container"><div class="sidebar-image-placeholder" data-path="{path}" data-last-modified="{last-modified}" data-loading="true" data-control="sidebar-thumbnail"></div></div>
+    <div class="sidebar-image-placeholder-container"><div class="sidebar-image-placeholder" data-path=":path" data-last-modified=":last-modified" data-loading="true" data-control="sidebar-thumbnail"></div></div>
 </script>
 
 <script type="text/template" data-control="no-selection-template">
@@ -44,6 +44,7 @@
         </div>
     </div>
 </script>
+
 <div class="panel hide" data-control="sidebar-labels">
 	<label>제목</label>
 	<p data-label="title"></p>

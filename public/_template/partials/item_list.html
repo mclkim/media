@@ -23,7 +23,7 @@
 				<tr data-type="media-item" data-item-type="{.item}"
 					data-path="{.path}/{.name}" data-title="{.name}"
 					data-size="{.byte}" data-last-modified="{.date}"
-					data-last-modified-ts="{.date}" data-public-url=""
+					data-last-modified-ts="{.modified}" data-public-url="{.publicUrl}"
 					data-document-type="{.type}" data-folder="{.path}" tabindex="0">
 					<td>
 						<div class="item-title no-wrap-text">
@@ -37,8 +37,6 @@
 					<td>{.byte}</td>
 					<td>{=date("y-m-d h:i A",.modified)}</td>
 				</tr>
-				<!-- {:} -->
-				<p class="no-data">요청한 파일을 찾을수 없습니다.</p>
 				<!-- {/} -->
 			</tbody>
 		</table>
@@ -60,8 +58,8 @@
 			<!-- {@items} -->
 			<li data-type="media-item" data-item-type="{.item}"
 				data-path="{.path}/{.name}" data-title="{.name}" data-size="{.byte}"
-				data-last-modified="{.date}" data-last-modified-ts="{.date}"
-				data-public-url="" data-document-type="{.type}"
+				data-last-modified="{.date}" data-last-modified-ts="{.modified}"
+				data-public-url="{.publicUrl}" data-document-type="{.type}"
 				data-folder="{.path}" tabindex="0">
 				<div class="icon-container">
 					<div class="icon-wrapper">
@@ -80,8 +78,6 @@
 					<p class="size">{.byte}</p>
 				</div>
 			</li>
-			<!-- {:} -->
-			<li class="no-data">요청한 파일을 찾을수 없습니다.</li>
 			<!-- {/} -->
 		</ul>
 		<!-- {/} -->

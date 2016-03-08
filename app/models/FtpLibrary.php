@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\FtpLibraryItem;
+
 class FtpLibrary {
 	const SORT_BY_NAME = 'name';
 	const SORT_BY_SIZE = 'size';
@@ -161,10 +163,6 @@ class FtpLibrary {
 	}
 	protected function parseRawList($directory = null, $recursive = false) {
 		try {
-			// $list = $this->ftp->rawlist ( $directory );
-			// $options = $recursive ? '-alnR' : '-aln';
-			// $options = '-rtla';
-			// $list = $this->ftp->rawlist ( $options . ' ' . $directory );
 			$list = $this->ftp->rawlist ( $directory, $recursive );
 		} catch ( Exception $e ) {
 			throw new FtpException ( $e->getMessage () );
@@ -192,11 +190,8 @@ class FtpLibrary {
 			$item = ($isdir) ? 'folder' : 'file';
 			
 			// TODO::시간변환작업을 해야 하나??
-			$script_tz = date_default_timezone_get ();
-			date_default_timezone_set ( 'UTC' );
 			$mtime = strtotime ( $listline ['mtime'] );
 			$stamp = ($mtime > time ()) ? strtotime ( "-1 year", $mtime ) : $mtime;
-			date_default_timezone_set ( $script_tz );
 			
 			$ext = pathinfo ( $listline ['dirfilename'], PATHINFO_EXTENSION ) ?  : 'unknown';
 			
@@ -206,6 +201,8 @@ class FtpLibrary {
 			$type = FtpLibraryItem::getInstance ()->getFileType ( $item, $ext );
 			$icon = FtpLibraryItem::getInstance ()->itemTypeToIconClass ( $item, $type );
 			$byte = FtpLibraryItem::getInstance ()->byteconvert ( $listline ['size'] );
+			$publicUrl = 'http://192.168.0.1:8000/list';
+			$encoded = implode ( "/", array_map ( "rawurlencode", explode ( "/", $path . "/" . $name ) ) );
 			
 			if ($isdir) {
 				$folders_list [] = array (
@@ -222,7 +219,8 @@ class FtpLibrary {
 						'byte' => '',
 						'date' => date ( "Y-m-d h:i A", $stamp ), // $listline ['mtime'],
 						'modified' => $stamp,
-						'raw' => $listline ['raw'] 
+						'raw' => $listline ['raw'],
+						'publicUrl' => $publicUrl . $encoded 
 				);
 			} else {
 				$files_list [] = array (
@@ -240,7 +238,8 @@ class FtpLibrary {
 						'date' => date ( "Y-m-d h:i A", $stamp ), // $listline ['mtime'],
 						'modified' => $stamp,
 						'base64' => base64_encode ( $name ),
-						'raw' => $listline ['raw'] 
+						'raw' => $listline ['raw'],
+						'publicUrl' => $publicUrl . $encoded 
 				);
 			}
 		}
@@ -270,7 +269,12 @@ class FtpLibrary {
 		 * Try to load the contents from cache
 		 */
 		
+		$script_tz = date_default_timezone_get ();
+		date_default_timezone_set ( 'UTC' );
+		
 		$folderContents = $this->parseRawList ( $folder );
+		
+		date_default_timezone_set ( $script_tz );
 		
 		/**
 		 * Sort the result and combine the file and folder lists
@@ -406,6 +410,40 @@ class FtpLibrary {
 			return false;
 		}
 		return true;
+	}
+	public function downloadFile($path = '/', $tempfile, $mode = 'auto') {
+		$fullpath = self::validatePath ( $path );
+		$path = dirname ( $fullpath );
+		$file = FtpLibraryItem::getInstance ()->getbasename ( $fullpath );
+		
+		logger ( $path );
+		logger ( $file );
+		logger ( $tempfile );
+		
+		// TODO::임시 파일지정
+		$tempfile = tempnam ( uniqid ( rand (), TRUE ), 'downl__' );
+		if ($tempfile == false) {
+			// unlink ( $tempfile );
+			// $this->err ( "Unable to create the temporary file." );
+			throw new FtpException ( "Unable to create the temporary file." );
+		} // end if
+		  
+		// Set the mode if not specified
+		if ($mode === 'auto') {
+			$extension = pathinfo ( $file, PATHINFO_EXTENSION ) ?  : 'unknown';
+			$mode = FtpLibraryItem::getInstance ()->getFileMode ( $extension );
+		}
+		
+		try {
+			$this->ftp->chdir ( $path );
+			$mode = ($mode === 'ascii') ? FTP_ASCII : FTP_BINARY;
+			// Get the file
+			$this->ftp->get ( $tempfile, $file, $mode );
+		} catch ( Exception $e ) {
+			throw new FtpException ( $e->getMessage () );
+			return false;
+		}
+		return $tempfile;
 	}
 	public function resetCache() {
 	}

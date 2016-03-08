@@ -3,10 +3,8 @@
 .project
 .settings
 !robots.txt
-<<<<<<< HEAD
-=======
-_compile/**
->>>>>>> ecfab997e111810749f9395998dba63c135f62bf
+**/_compile/**
+**/_thumbnail/**
 /config/config.php
 composer.lock
 log/**

@@ -2,13 +2,13 @@
 use \Kaiser\Controller;
 use \Kaiser\Exception\ApplicationException;
 use \App\Models\FtpLibraryItem;
+use \App\Models\FtpLibrary;
+use \App\Models\FtpManager;
 /**
  */
 class manager extends Controller {
 	protected function requireLogin() {
 		return false;
-	}
-	function execute() {
 	}
 	function upload() {
 		logger ( $_POST );
@@ -83,6 +83,41 @@ class manager extends Controller {
 	}
 	public function onGetSidebarThumbnail() {
 		logger ( $_POST );
+		
+		$path = $this->getParameter ( 'path' );
+		$path = FtpLibrary::validatePath ( $path );
+
+		$lastModified = $this->getParameter ( 'lastModified' );
+		if (! is_numeric ( $lastModified )) {
+			throw new ApplicationException ( 'Invalid input data' );
+		}
+		
+// 		$publicUrl = 'http://192.168.0.1:8000/list';
+// 		$encoded = implode ( "/", array_map ( "rawurlencode", explode ( "/", $path ) ) );
+
+		$ftp = $this->container->get ( 'ftp' );
+		$model = new \App\Models\FtpManager ( $ftp );
+		
+		$thumbnailParams = $model->getThumbnailParams ();
+		$thumbnailParams ['height'] = 255;
+		$thumbnailParams ['width'] = 300;
+		$thumbnailParams ['mode'] = 'auto';
+		
+		$thumbnailInfo = $thumbnailParams;
+		$thumbnailInfo ['path'] = $path;
+		$thumbnailInfo ['lastModified'] = $lastModified;
+		$thumbnailInfo ['id'] = 'sidebar-thumbnail';
+		
+		$var = $model->generateThumbnail ( $thumbnailInfo, $thumbnailParams, true );
+		
+		$tpl = $this->container->get ( 'template' );
+		$tpl->assign ( $var );
+		$tpl->define ( "thumbnail_image", "partials/thumbnail_image.html" );
+		
+		return [ 
+				'id' => 'sidebar-thumbnail',
+				'markup' => $tpl->fetch ( "thumbnail_image" ) 
+		];
 	}
 	public function onChangeView() {
 		logger ( $_POST );
@@ -345,6 +380,13 @@ class manager extends Controller {
 		];
 	}
 	public function onSetSidebarVisible() {
+		logger ( $_POST );
+		
+		$visible = $this->getParameter ( 'visible' );
+		
+		$ftp = $this->container->get ( 'ftp' );
+		$model = new \App\Models\FtpManager ( $ftp );
+		$model->setSidebarVisible ( $visible );
 	}
 	public function onLoadPopup() {
 	}

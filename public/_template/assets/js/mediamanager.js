@@ -410,12 +410,13 @@
 						.querySelector('[data-control="image-template"]').innerHTML
 				break;
 			}
-			previewContainer.innerHTML = template.replace('{src}',
-					item.getAttribute('data-public-url')).replace('{path}',
-					item.getAttribute('data-path')).replace('{last-modified}',
+
+			previewContainer.innerHTML = template.replace(':src',
+					item.getAttribute('data-public-url')).replace(':path',
+					item.getAttribute('data-path')).replace(':last-modified',
 					item.getAttribute('data-last-modified-ts'))
-					
-			if (documentType == 'image'){
+
+			if (documentType == 'image') {
 				this.loadSidebarThumbnail()
 			}
 		}
@@ -498,8 +499,10 @@
 			}
 			this.sidebarThumbnailAjax = null
 		}
+
 		var sidebarThumbnail = this.sidebarPreviewElement
 				.querySelector('[data-control="sidebar-thumbnail"]')
+
 		if (!sidebarThumbnail)
 			return null
 
@@ -507,6 +510,7 @@
 			path : sidebarThumbnail.getAttribute('data-path'),
 			lastModified : sidebarThumbnail.getAttribute('data-last-modified')
 		}
+
 		this.sidebarThumbnailAjax = this.$form.request(
 				this.options.alias + '::onGetSidebarThumbnail', {
 					data : data
@@ -706,7 +710,8 @@
 		formData.append('path', this.$el.find('[data-type="current-folder"]')
 				.val())
 		formData.append('X_OCTOBER_FILEUPLOAD', this.options.uniqueId)
-		formData.append('X-October-Request-Handler', this.options.alias + '::' + 'upload')
+		formData.append('X-October-Request-Handler', this.options.alias + '::'
+				+ 'upload')
 	}
 	MediaManager.prototype.uploadCancelAll = function() {
 		this.dropzone.removeAllFiles(true)
