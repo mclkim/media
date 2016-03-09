@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use \Kaiser\Exception\ApplicationException;
+use \Kaiser\Exception\SystemException;
 use \Eventviva\ImageResize;
 
 class FtpManager extends FtpLibrary {
@@ -144,13 +145,10 @@ class FtpManager extends FtpLibrary {
 		
 		return true;
 	}
-	function generateThumbnail($thumbnailInfo, $thumbnailParams = null) {
-		$publicUrl = 'http://localhost//media/public/_thumbnail/';
-		// $encoded = implode ( "/", array_map ( "rawurlencode", explode ( "/", $path ) ) );
+	public function generateThumbnail($thumbnailInfo, $thumbnailParams = null) {
+		$publicUrl = 'http://localhost/media/public/_thumbnail/';
 		$tempFilePath = null;
-		$fullThumbnailPath = null;
 		$thumbnailPath = null;
-		$markup = null;
 		
 		try {
 			// Get and validate input data
@@ -169,34 +167,36 @@ class FtpManager extends FtpLibrary {
 				$thumbnailParams ['height'] = $height;
 			}
 			
+			// If the thumbnail file exists - just return the thumbnail marup,
+			// otherwise generate a new thumbnail.
 			$thumbnailPath = $this->getThumbnailImagePath ( $thumbnailParams, $path, $lastModified );
-			// logger($thumbnailPath);
+			if ($this->thumbnailExists ( $thumbnailPath )) {
+				return [ 
+						'isError' => false,
+						'imageUrl' => $publicUrl . FtpLibraryItem::getInstance ()->getbasename ( $thumbnailPath ) 
+				];
+			}
 			
-			$fullThumbnailPath = temp_path ( ltrim ( $thumbnailPath, '/' ) );
-			// logger(temp_path());
-			// $encoded = implode ( "/", array_map ( "rawurlencode", explode ( "/", $path ) ) );
 			// Save the file locally
-			$tempFilePath = $this->getLocalTempFilePath ( $path );
-			
-			if (! $fullThumbnailPath = $this->downloadFile ( $path, $thumbnailPath )) {
+			$tempFilePath = $this->getLocalTempFilePath ();
+			if (! $this->downloadFile ( $path, $tempFilePath )) {
 				throw new SystemException ( 'Error saving remote file to a temporary location' );
 			}
-			logger ( $fullThumbnailPath );
+			
 			// Resize the thumbnail and save to the thumbnails directory
-			$this->resizeImage ( $fullThumbnailPath, $thumbnailParams, $tempFilePath );
+			$this->resizeImage ( $tempFilePath, $thumbnailParams, $thumbnailPath );
 		} catch ( Exception $ex ) {
 			// $this->err ( $ex->getMessage () );
 			return [ 
 					'isError' => true 
 			];
 		}
-		logger ( $publicUrl . $tempFilePath );
 		return [ 
 				'isError' => false,
-				'imageUrl' => $publicUrl .FtpLibraryItem::getInstance ()->getbasename ( $tempFilePath )  
+				'imageUrl' => $publicUrl . FtpLibraryItem::getInstance ()->getbasename ( $thumbnailPath ) 
 		];
 	}
-	protected function resizeImage($fullThumbnailPath, $thumbnailParams, $tempFilePath) {
+	protected function resizeImage($tempFilePath, $thumbnailParams, $thumbnailPath) {
 		/**
 		 * PHP must be enabled:
 		 * extension=php_mbstring.dll
@@ -204,39 +204,44 @@ class FtpManager extends FtpLibrary {
 		 *
 		 * @var unknown
 		 */
-		$image = new ImageResize ( $fullThumbnailPath );
-		$image->resizeToWidth ( $thumbnailParams ['width'] );
-// 		$image->resizeToHeight ( $thumbnailParams ['height'] );
-		logger ( $tempFilePath );
-		$image->save ( $tempFilePath );
+		$image = new ImageResize ( $tempFilePath );
+		$image->resizeToBestFit ( $thumbnailParams ['width'], $thumbnailParams ['height'] );
+		// logger ( $thumbnailPath );
+		$image->save ( $thumbnailPath );
 	}
 	protected function getThumbnailImagePath($thumbnailParams, $itemPath, $lastModified) {
-		logger ( $itemPath );
-		logger ( $lastModified );
 		$itemSignature = md5 ( $itemPath ) . $lastModified;
 		
 		$thumbFile = 'thumb_' . $itemSignature . '_' . $thumbnailParams ['width'] . 'x' . $thumbnailParams ['height'] . '_' . $thumbnailParams ['mode'] . '.' . $thumbnailParams ['ext'];
 		
 		$partition = implode ( '/', array_slice ( str_split ( $itemSignature, 3 ), 0, 3 ) ) . '/';
+		$partition = '/';
 		
 		$result = $this->getThumbnailDirectory () . $partition . $thumbFile;
 		
 		return $result;
 	}
 	protected function getThumbnailDirectory() {
-	}
-	protected function getLocalTempFilePath($fileName) {
-		$fileName = md5 ( $fileName . uniqid () . microtime () );
-		
-		// $path = temp_path () . '/media';
-		$path = __DIR__ . '/../../public/_thumbnail';
+		$path = realpath ( __DIR__ . '/../../public/_thumbnail' );
 		
 		if (! is_dir ( $path ))
 			mkdir ( $path, 0777 );
 		
-		return $path . '/' . $fileName;
+		return $path;
 	}
-	function getThumbnailParams($viewMode = null) {
+	public function getLocalTempFilePath() {
+		// TODO::임시 파일지정
+		$tempfile = tempnam ( uniqid ( rand (), TRUE ), 'downl__' );
+		if ($tempfile == false) {
+			// unlink ( $tempfile );
+			throw new FtpException ( "Unable to create the temporary file." );
+		} // end if
+		return $tempfile;
+	}
+	protected function thumbnailExists($fullPath) {
+		return file_exists ( $fullPath ) ? $fullPath : false;
+	}
+	public function getThumbnailParams($viewMode = null) {
 		$result = [ 
 				'mode' => 'crop',
 				'ext' => 'png' 

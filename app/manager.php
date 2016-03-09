@@ -1,16 +1,18 @@
 <?php
 use \Kaiser\Controller;
 use \Kaiser\Exception\ApplicationException;
+use \Kaiser\Exception\SystemException;
 use \App\Models\FtpLibraryItem;
 use \App\Models\FtpLibrary;
 use \App\Models\FtpManager;
+use Apfelbox\FileDownload\FileDownload;
 /**
  */
 class manager extends Controller {
 	protected function requireLogin() {
 		return false;
 	}
-	function upload() {
+	public function onUpload() {
 		logger ( $_POST );
 		
 		$config = $this->container->get ( 'config' );
@@ -28,7 +30,10 @@ class manager extends Controller {
 		if (($file = $upload->getFiles ()) !== false) {
 			$model = new \App\Models\FtpManager ( $ftp );
 			
-			$model->uploadFile ( $path, $file );
+			// $model->uploadFile ( $path, $file );
+			if (! $model->uploadFile ( $path, $file )) {
+				throw new SystemException ( 'Error saving remote file to a temporary location' );
+			}
 		} else {
 			$this->err ( $upload->get_error_message () );
 		}
@@ -86,15 +91,12 @@ class manager extends Controller {
 		
 		$path = $this->getParameter ( 'path' );
 		$path = FtpLibrary::validatePath ( $path );
-
+		
 		$lastModified = $this->getParameter ( 'lastModified' );
 		if (! is_numeric ( $lastModified )) {
 			throw new ApplicationException ( 'Invalid input data' );
 		}
 		
-// 		$publicUrl = 'http://192.168.0.1:8000/list';
-// 		$encoded = implode ( "/", array_map ( "rawurlencode", explode ( "/", $path ) ) );
-
 		$ftp = $this->container->get ( 'ftp' );
 		$model = new \App\Models\FtpManager ( $ftp );
 		
@@ -233,6 +235,49 @@ class manager extends Controller {
 		return [ 
 				'#MediaManager-manager-item-list' => $tpl->fetch ( "item_list" ) 
 		];
+	}
+	public function onDownload() {
+		logger ( $_POST );
+		
+		$paths = $this->getParameter ( 'paths' );
+		
+		if (! is_array ( $paths )) {
+			throw new ApplicationException ( 'Invalid input data' );
+		}
+		
+		$filesToDownload = [ ];
+		$folderToDownload = [ ];
+		foreach ( $paths as $pathInfo ) {
+			if (! isset ( $pathInfo ['path'] ) || ! isset ( $pathInfo ['type'] )) {
+				throw new ApplicationException ( 'Invalid input data' );
+			}
+			
+			if ($pathInfo ['type'] == 'file') {
+				$filesToDownload [] = $pathInfo ['path'];
+			} else if ($pathInfo ['type'] == 'folder') {
+				$folderToDownload [] = $pathInfo ['path'];
+			}
+		}
+		
+		$ftp = $this->container->get ( 'ftp' );
+		$model = new \App\Models\FtpManager ( $ftp );
+		
+		if (count ( $folderToDownload ) > 0 || count ( $filesToDownload ) > 1) {
+		} else {
+			logger ( $folderToDownload );
+			logger ( $filesToDownload );
+			$path = array_pop ( $filesToDownload );
+			logger ( $path );
+			$file = FtpLibraryItem::getInstance ()->getbasename ( $path );
+			
+			$tempFilePath = $model->getLocalTempFilePath ();
+			if (! $model->downloadFile ( $path, $tempFilePath )) {
+				throw new SystemException ( 'Error saving remote file to a temporary location' );
+			}
+			
+			$fileDownload = FileDownload::createFromFilePath ( $tempFilePath );
+			$fileDownload->sendDownload ( $filename );
+		}
 	}
 	public function onLoadRenamePopup() {
 		logger ( $_POST );

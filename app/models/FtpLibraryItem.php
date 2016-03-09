@@ -104,13 +104,13 @@ class FtpLibraryItem extends Singleton {
 	 * @param string $type        	
 	 * @param string $publicUrl        	
 	 */
-// 	public function __construct($path, $size, $lastModified, $type, $publicUrl) {
-// 		$this->path = $path;
-// 		$this->size = $size;
-// 		$this->lastModified = $lastModified;
-// 		$this->type = $type;
-// 		$this->publicUrl = $publicUrl;
-// 	}
+	// public function __construct($path, $size, $lastModified, $type, $publicUrl) {
+	// $this->path = $path;
+	// $this->size = $size;
+	// $this->lastModified = $lastModified;
+	// $this->type = $type;
+	// $this->publicUrl = $publicUrl;
+	// }
 	
 	/**
 	 *
@@ -139,6 +139,7 @@ class FtpLibraryItem extends Singleton {
 		self::$compressedExtensions = self::$defaultTypeExtensions ['compressed'];
 		
 		// $extension = pathinfo ( $this->path, PATHINFO_EXTENSION );
+		$extension = strtolower  ( $extension );
 		if (! strlen ( $extension )) {
 			return self::FILE_TYPE_DOCUMENT;
 		}
@@ -200,7 +201,7 @@ class FtpLibraryItem extends Singleton {
 				return "icon-file";
 		}
 	}
-	public function getFileMode ($ext) {
+	public function getFileMode($ext) {
 		$text_types = array (
 				'txt',
 				'text',

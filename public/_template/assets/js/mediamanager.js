@@ -253,6 +253,7 @@
 		}
 	}
 	MediaManager.prototype.toggleMoveAndDelete = function(value) {
+		$('[data-command=download]', this.$el).prop('disabled', value)
 		$('[data-command=delete]', this.$el).prop('disabled', value)
 		$('[data-command=move]', this.$el).prop('disabled', value)
 	}
@@ -710,8 +711,7 @@
 		formData.append('path', this.$el.find('[data-type="current-folder"]')
 				.val())
 		formData.append('X_OCTOBER_FILEUPLOAD', this.options.uniqueId)
-		formData.append('X-October-Request-Handler', this.options.alias + '::'
-				+ 'upload')
+		formData.append('X-October-Request-Handler', this.options.alias + '::onUpload')
 	}
 	MediaManager.prototype.uploadCancelAll = function() {
 		this.dropzone.removeAllFiles(true)
@@ -818,6 +818,38 @@
 			$.oc.stripeLoadIndicator.hide()
 		}).done(this.proxy(this.afterNavigate))
 	}
+	MediaManager.prototype.downloadItems = function() {
+		var items = this.$el.get(0).querySelectorAll(
+				'[data-type="media-item"].selected')
+		if (!items.length) {
+			$.oc.alert(this.options.downloadEmpty)
+			return null
+		}
+		$.oc.confirm(this.options.downloadConfirm, this
+				.proxy(this.downloadConfirmation))
+	}
+	MediaManager.prototype.downloadConfirmation = function(confirmed) {
+		if (!confirmed)
+			return null
+
+		var items = this.$el.get(0).querySelectorAll(
+				'[data-type="media-item"].selected'), paths = []
+		for (var i = 0, len = items.length; i < len; i++) {
+			paths.push({
+				'path' : items[i].getAttribute('data-path'),
+				'type' : items[i].getAttribute('data-item-type')
+			})
+		}
+		var data = {
+			paths : paths
+		}
+		$.oc.stripeLoadIndicator.show()
+		// this.$form.request(this.options.alias + '::onDownload', {
+		// 	data : data
+		// }).always(function() {
+		// 	$.oc.stripeLoadIndicator.hide()
+		// }).done(this.proxy(this.afterNavigate))
+	}	
 	MediaManager.prototype.createFolder = function(ev) {
 		$(ev.target).popup(
 				{
@@ -940,6 +972,9 @@
 		case 'delete':
 			this.deleteItems()
 			break;
+		case 'download':
+			this.downloadItems()
+			break;			
 		case 'create-folder':
 			this.createFolder(ev)
 			break;
@@ -1096,6 +1131,8 @@
 		uniqueId : null,
 		deleteEmpty : 'Please select files to delete.',
 		deleteConfirm : 'Do you really want to delete the selected file(s)?',
+		downloadEmpty : 'Please select files to download.',
+		downloadConfirm : 'Do you really want to download the selected file(s)?',		
 		moveEmpty : 'Please select files to move.',
 		selectSingleImage : 'Please select a single image.',
 		selectionNotImage : 'The selected item is not an image.',

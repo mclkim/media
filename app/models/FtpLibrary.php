@@ -415,19 +415,7 @@ class FtpLibrary {
 		$fullpath = self::validatePath ( $path );
 		$path = dirname ( $fullpath );
 		$file = FtpLibraryItem::getInstance ()->getbasename ( $fullpath );
-		
-		logger ( $path );
-		logger ( $file );
-		logger ( $tempfile );
-		
-		// TODO::임시 파일지정
-		$tempfile = tempnam ( uniqid ( rand (), TRUE ), 'downl__' );
-		if ($tempfile == false) {
-			// unlink ( $tempfile );
-			// $this->err ( "Unable to create the temporary file." );
-			throw new FtpException ( "Unable to create the temporary file." );
-		} // end if
-		  
+			  
 		// Set the mode if not specified
 		if ($mode === 'auto') {
 			$extension = pathinfo ( $file, PATHINFO_EXTENSION ) ?  : 'unknown';
@@ -443,7 +431,7 @@ class FtpLibrary {
 			throw new FtpException ( $e->getMessage () );
 			return false;
 		}
-		return $tempfile;
+		return true;
 	}
 	public function resetCache() {
 	}
