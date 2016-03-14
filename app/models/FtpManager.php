@@ -16,7 +16,6 @@ class FtpManager extends FtpLibrary {
 	const SELECTION_MODE_FIXED_SIZE = 'fixed-size';
 	const FILTER_EVERYTHING = 'everything';
 	public function prepareVars($container) {
-
 		$folder = $this->getCurrentFolder ();
 		$viewMode = $this->getViewMode ();
 		$filter = $this->getFilter ();
@@ -148,7 +147,7 @@ class FtpManager extends FtpLibrary {
 		return true;
 	}
 	public function generateThumbnail($thumbnailInfo, $thumbnailParams = null) {
-		$publicUrl = 'http://localhost/media/public/_thumbnail/';
+		$publicUrl = '_thumbnail/';
 		$tempFilePath = null;
 		$thumbnailPath = null;
 		
@@ -223,11 +222,56 @@ class FtpManager extends FtpLibrary {
 		
 		return $result;
 	}
+	/**
+	 * Makes directory and returns BOOL(TRUE) if exists OR made.
+	 *
+	 * @param $path Path
+	 *        	name
+	 * @return bool
+	 */
+	protected function rmkdir($path, $mode = 0755) {
+		$path = rtrim ( preg_replace ( array (
+				"/\\\\/",
+				"/\/{2,}/" 
+		), "/", $path ), "/" );
+		$e = explode ( "/", ltrim ( $path, "/" ) );
+		if (substr ( $path, 0, 1 ) == "/") {
+			$e [0] = "/" . $e [0];
+		}
+		$c = count ( $e );
+		$cp = $e [0];
+		for($i = 1; $i < $c; $i ++) {
+			if (! is_dir ( $cp ) && ! @mkdir ( $cp, $mode )) {
+				return false;
+			}
+			$cp .= "/" . $e [$i];
+		}
+		return @mkdir ( $path, $mode );
+	}
+	protected function absolutizePath($path) {
+		$path = str_replace ( array (
+				'/',
+				'\\' 
+		), DIRECTORY_SEPARATOR, $path );
+		$parts = array_filter ( explode ( DIRECTORY_SEPARATOR, $path ), 'strlen' );
+		$absolutes = array ();
+		foreach ( $parts as $part ) {
+			if ('.' == $part)
+				continue;
+			if ('..' == $part) {
+				array_pop ( $absolutes );
+			} else {
+				$absolutes [] = $part;
+			}
+		}
+		return implode ( DIRECTORY_SEPARATOR, $absolutes );
+	}
 	protected function getThumbnailDirectory() {
-		$path = realpath ( __DIR__ . '/../../public/_thumbnail' );
+		$thumbnail = __DIR__ . '/../../public/_thumbnail';
+		$path = $this->absolutizePath ( $thumbnail );
 		
 		if (! is_dir ( $path ))
-			mkdir ( $path, 0777 );
+			mkdir ( $path, 0755, true );
 		
 		return $path;
 	}
