@@ -16,7 +16,6 @@ class FtpManager extends FtpLibrary {
 	const SELECTION_MODE_FIXED_SIZE = 'fixed-size';
 	const FILTER_EVERYTHING = 'everything';
 	public function prepareVars($container) {
-
 		$folder = $this->getCurrentFolder ();
 		$viewMode = $this->getViewMode ();
 		$filter = $this->getFilter ();
@@ -226,8 +225,8 @@ class FtpManager extends FtpLibrary {
 	protected function getThumbnailDirectory() {
 		$path = realpath ( __DIR__ . '/../../public/_thumbnail' );
 		
-		if (! is_dir ( $path ))
-			mkdir ( $path, 0777 );
+		// if (! is_dir ( $path ))
+		// mkdir ( $path, 0777 );
 		
 		return $path;
 	}
