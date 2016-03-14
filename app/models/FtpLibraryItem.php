@@ -139,7 +139,7 @@ class FtpLibraryItem extends Singleton {
 		self::$compressedExtensions = self::$defaultTypeExtensions ['compressed'];
 		
 		// $extension = pathinfo ( $this->path, PATHINFO_EXTENSION );
-		$extension = strtolower  ( $extension );
+		$extension = strtolower ( $extension );
 		if (! strlen ( $extension )) {
 			return self::FILE_TYPE_DOCUMENT;
 		}
@@ -255,5 +255,10 @@ class FtpLibraryItem extends Singleton {
 		if (preg_match ( $pattern, $path, $matches ))
 			return $matches [1];
 		return '';
+	}
+	public function getextension($file) {
+		// *** Get extension
+		$extension = strtolower ( strrchr ( $file, '.' ) );
+		return $extension;
 	}
 }
