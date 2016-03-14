@@ -249,6 +249,20 @@ class FtpLibrary {
 				'files' => (is_array ( $files_list )) ? $files_list : array () 
 		);
 	}
+	protected function _lsDirs($path) {
+		$list = $this->parseRawList ( $path );
+		if ($list == false) {
+			return false;
+		}
+		return $list ["folders"];
+	}
+	protected function _lsFiles($path) {
+		$list = $this->parseRawList ( $path );
+		if ($list == false) {
+			return false;
+		}
+		return $list ["files"];
+	}
 	/**
 	 * Returns a list of folders and files in a Library folder.
 	 *
@@ -415,13 +429,11 @@ class FtpLibrary {
 		$fullpath = self::validatePath ( $path );
 		$path = dirname ( $fullpath );
 		$file = FtpLibraryItem::getInstance ()->getbasename ( $fullpath );
-			  
 		// Set the mode if not specified
 		if ($mode === 'auto') {
 			$extension = pathinfo ( $file, PATHINFO_EXTENSION ) ?  : 'unknown';
 			$mode = FtpLibraryItem::getInstance ()->getFileMode ( $extension );
 		}
-		
 		try {
 			$this->ftp->chdir ( $path );
 			$mode = ($mode === 'ascii') ? FTP_ASCII : FTP_BINARY;
@@ -433,6 +445,74 @@ class FtpLibrary {
 		}
 		return true;
 	}
+	public function getLocalTempFilePath() {
+		// TODO::임시 파일지정
+		$tempfile = tempnam ( uniqid ( rand (), TRUE ), 'downl__' );
+		if ($tempfile == false) {
+			// unlink ( $tempfile );
+			throw new FtpException ( "Unable to create the temporary file." );
+		} // end if
+		return $tempfile;
+	}
+	public function zip($folders, $files, $destination, $overwrite = true) {
+		if (class_exists ( 'ZipArchive' ) == false) {
+			exit ( 'PHP - ZipArchive is not enabled or not found' );
+		}
+		
+		try {
+			$zip = new \ZipArchive ();
+			
+			if ($zip->open ( $destination, $overwrite ? \ZIPARCHIVE::OVERWRITE : \ZIPARCHIVE::CREATE ) !== true) {
+				// echo 'Error: Unable to create zip file';
+				throw new FtpException ( 'Error: Unable to create zip file' );
+				// return false;
+			}
+			
+			// 선택한 폴더를 압축하기
+			if (count ( $folders )) {
+				foreach ( $folders as $path ) {
+					$this->zipRecursive ( $zip, $path );
+				}
+			}
+			
+			// 선택한 파일을 압축하기
+			if (count ( $files )) {
+				foreach ( $files as $file ) {
+					// $v = base64_decode ( $v );
+					$this->zipAdd ( $zip, $file );
+				}
+			}
+			
+			$zip->close ();
+			return file_exists ( $destination );
+		} catch ( Exception $e ) {
+			throw new FtpException ( $e->getMessage () );
+		}
+		return $zip;
+	}
+	private function zipAdd(&$zip, $file) {
+		// Get the file
+		$tempfile = $this->getLocalTempFilePath ();
+		$this->downloadFile ( $file, $tempfile );
+		
+		// TODO::경로시작을 '/'으로 시작하면 탐색기 미리보기에서 압축파일목록이 나오지 않음.
+		$zip->addFile ( $tempfile, $file );
+	}
+	private function zipRecursive(&$zip, $path) {
+		if ($this->ftp->isDir ( $path ) && $this->ftp->chdir ( $path )) {
+			// Logger::debug ( $path );
+			$result = $this->_lsFiles ( $path );
+			// Logger::debug ( $result );
+			foreach ( $result as $file ) {
+				$this->zipAdd ( $zip, rtrim ( $path, '/' ) . '/' . $file ['name'] );
+			}
+			$result = $this->_lsDirs ( $path );
+			// Logger::debug ( $result );
+			foreach ( $result as $dir ) {
+				$this->zipRecursive ( $zip, rtrim ( $path, '/' ) . '/' . $dir ['name'] );
+			}
+		}
+	}
 	public function resetCache() {
 	}
 	public static function validatePath($path, $normalizeOnly = false) {
@@ -440,10 +520,9 @@ class FtpLibrary {
 		$path = '/' . trim ( $path, '/' );
 		
 		if ($normalizeOnly)
-			return $path;
-		
-		if (strpos ( $path, '..' ) !== false)
-			throw new ApplicationException ( "지정된 잘못된 파일 경로: '$path'." );
+			
+			if (strpos ( $path, '..' ) !== false)
+				throw new ApplicationException ( "지정된 잘못된 파일 경로: '$path'." );
 		
 		if (strpos ( $path, './' ) !== false || strpos ( $path, '//' ) !== false)
 			throw new ApplicationException ( "지정된 잘못된 파일 경로: '$path'." );

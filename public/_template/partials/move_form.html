@@ -1,11 +1,8 @@
-<form method="POST" action="http://localhost/media/public/"
-	accept-charset="UTF-8">
+<form method="POST" action="{baseUrl}" accept-charset="UTF-8">
 	<!-- _token -->
-	<input name="_token" value="SrtTe2H2xbbxrNeAXsDbA9wvqm3qHrda9Iw8PDqk"
-		type="hidden">
+	<input name="_token" value="{_token}" type="hidden">
 	<!-- _session_key -->
-	<input name="_session_key"
-		value="hWjVfd9FL2PhfnbcSoOiwdh2u9NcJdDwcp9TOdbW" type="hidden">
+	<input name="_session_key" value="{_session_key}" type="hidden">
 	<!-- modal-header -->
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="popup">&times;</button>
@@ -18,10 +15,8 @@
 			<!-- select -->
 			<select class="form-control custom-select" name="dest"
 				data-placeholder="선택">
-				<option></option>
-				{@folders}
-				<option value="{.key_}">{.value_}</option>
-				{/}
+				<option></option> {@folders}
+				<option value="{.key_}">{.value_}</option> {/}
 			</select>
 			<!-- input -->
 			<input name="originalPath" value="/" type="hidden">

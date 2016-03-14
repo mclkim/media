@@ -15,7 +15,8 @@ class FtpManager extends FtpLibrary {
 	const SELECTION_MODE_FIXED_RATIO = 'fixed-ratio';
 	const SELECTION_MODE_FIXED_SIZE = 'fixed-size';
 	const FILTER_EVERYTHING = 'everything';
-	public function prepareVars() {
+	public function prepareVars($container) {
+
 		$folder = $this->getCurrentFolder ();
 		$viewMode = $this->getViewMode ();
 		$filter = $this->getFilter ();
@@ -29,6 +30,7 @@ class FtpManager extends FtpLibrary {
 			$items = $this->findFiles ( $searchTerm, $filter, $sortBy );
 		
 		return array (
+				'baseUrl' => $container->get ( 'router' )->getBaseUrl (),
 				'items' => $items,
 				'currentFolder' => $folder,
 				'isRootFolder' => $folder == self::FOLDER_ROOT,
@@ -228,15 +230,6 @@ class FtpManager extends FtpLibrary {
 			mkdir ( $path, 0777 );
 		
 		return $path;
-	}
-	public function getLocalTempFilePath() {
-		// TODO::임시 파일지정
-		$tempfile = tempnam ( uniqid ( rand (), TRUE ), 'downl__' );
-		if ($tempfile == false) {
-			// unlink ( $tempfile );
-			throw new FtpException ( "Unable to create the temporary file." );
-		} // end if
-		return $tempfile;
 	}
 	protected function thumbnailExists($fullPath) {
 		return file_exists ( $fullPath ) ? $fullPath : false;

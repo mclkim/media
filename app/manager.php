@@ -48,7 +48,7 @@ class manager extends Controller {
 		
 		$model->setSearchTerm ( $search );
 		
-		$var = $model->prepareVars ();
+		$var = $model->prepareVars ( $this->container );
 		
 		//
 		$tpl = $this->container->get ( 'template' );
@@ -70,7 +70,7 @@ class manager extends Controller {
 		$model = new \App\Models\FtpManager ( $ftp );
 		
 		$model->setCurrentFolder ( $path );
-		$var = $model->prepareVars ();
+		$var = $model->prepareVars ( $this->container );
 		
 		//
 		$tpl = $this->container->get ( 'template' );
@@ -133,7 +133,7 @@ class manager extends Controller {
 		$model->setViewMode ( $viewMode );
 		$model->setCurrentFolder ( $path );
 		
-		$var = $model->prepareVars ();
+		$var = $model->prepareVars ( $this->container );
 		
 		//
 		$tpl = $this->container->get ( 'template' );
@@ -160,7 +160,7 @@ class manager extends Controller {
 		$model->setFilter ( $filter );
 		$model->setCurrentFolder ( $path );
 		
-		$var = $model->prepareVars ();
+		$var = $model->prepareVars ( $this->container );
 		
 		//
 		$tpl = $this->container->get ( 'template' );
@@ -185,7 +185,7 @@ class manager extends Controller {
 		$model->setSortBy ( $sortBy );
 		$model->setCurrentFolder ( $path );
 		
-		$var = $model->prepareVars ();
+		$var = $model->prepareVars ( $this->container );
 		
 		//
 		$tpl = $this->container->get ( 'template' );
@@ -226,7 +226,7 @@ class manager extends Controller {
 		if (count ( $filesToDelete ) > 0)
 			$model->deleteFiles ( $filesToDelete );
 		
-		$var = $model->prepareVars ();
+		$var = $model->prepareVars ( $this->container );
 		
 		$tpl = $this->container->get ( 'template' );
 		$tpl->assign ( $var );
@@ -263,19 +263,33 @@ class manager extends Controller {
 		$model = new \App\Models\FtpManager ( $ftp );
 		
 		if (count ( $folderToDownload ) > 0 || count ( $filesToDownload ) > 1) {
+			// TODO::임시파일이름 지정
+			$tempFilePath = $model->getLocalTempFilePath ();
+			$zip = $model->zip ( $folderToDownload, $filesToDownload, $tempFilePath );
+			
+			$zipfile = $_SESSION ['data'] ['username'] . '-' . time () . '.zip';
+			$fileDownload = FileDownload::createFromFilePath ( $tempFilePath );
+			
+			header ( 'Set-Cookie: fileDownload=true; path=/' );
+			header ( 'Cache-Control: max-age=60, must-revalidate' );
+			$fileDownload->sendDownload ( $zipfile );
 		} else {
-			logger ( $folderToDownload );
-			logger ( $filesToDownload );
+			// logger ( $folderToDownload );
+			// logger ( $filesToDownload );
 			$path = array_pop ( $filesToDownload );
-			logger ( $path );
-			$file = FtpLibraryItem::getInstance ()->getbasename ( $path );
+			// logger ( $path );
+			$filename = FtpLibraryItem::getInstance ()->getbasename ( $path );
 			
 			$tempFilePath = $model->getLocalTempFilePath ();
 			if (! $model->downloadFile ( $path, $tempFilePath )) {
 				throw new SystemException ( 'Error saving remote file to a temporary location' );
 			}
-			
+			// logger ( $tempFilePath );
+			// logger ( $filename );
 			$fileDownload = FileDownload::createFromFilePath ( $tempFilePath );
+			
+			header ( 'Set-Cookie: fileDownload=true; path=/' );
+			header ( 'Cache-Control: max-age=60, must-revalidate' );
 			$fileDownload->sendDownload ( $filename );
 		}
 	}
@@ -319,7 +333,7 @@ class manager extends Controller {
 		}
 		
 		//
-		$var = $model->prepareVars ();
+		$var = $model->prepareVars ( $this->container );
 		
 		$tpl = $this->container->get ( 'template' );
 		$tpl->assign ( $var );
@@ -349,7 +363,7 @@ class manager extends Controller {
 		$model->makeFolder ( $newFolderPath );
 		
 		//
-		$var = $model->prepareVars ();
+		$var = $model->prepareVars ( $this->container );
 		
 		$tpl = $this->container->get ( 'template' );
 		$tpl->assign ( $var );
@@ -414,7 +428,7 @@ class manager extends Controller {
 		}
 		
 		//
-		$var = $model->prepareVars ();
+		$var = $model->prepareVars ( $this->container );
 		
 		$tpl = $this->container->get ( 'template' );
 		$tpl->assign ( $var );

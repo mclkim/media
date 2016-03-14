@@ -8,15 +8,18 @@ class index extends Controller {
 		return false;
 	}
 	function execute() {
-		$this->debug($_SESSION);
+		$this->debug ( $_SESSION );
+		
 		$ftp = $this->container->get ( 'ftp' );
 		
 		$model = new \App\Models\FtpManager ( $ftp );
-		$var = $model->prepareVars ();
+		$var = $model->prepareVars ($this->container);
 		
 		//
 		$tpl = $this->container->get ( 'template' );
+		
 		$tpl->assign ( $var );
+		
 		$tpl->define ( array (
 				"index" => "layouts/default.html",
 				"head" => "layouts/head.html",

@@ -1,15 +1,15 @@
-<form method="POST" action="http://localhost/media/public/"
-	accept-charset="UTF-8" class="layout" onsubmit="return false">
+<form method="POST" action="{baseUrl}" accept-charset="UTF-8"
+	class="layout" onsubmit="return false">
 	<!-- _token -->
-	<input name="_token" type="hidden"
-		value="Nibm3rLxyI9d5btuw5SaekuTOVWQnKKx9wL2lwdW">
+	<input name="_token" type="hidden" value="{_token}">
 	<!-- _session_key -->
-	<input name="_session_key" type="hidden"
-		value="3kOH57Z9G4pZdevjJMeGWeZBKVCnlTNB8mcgZA5B">
+	<input name="_session_key" type="hidden" value="{_session_key}">
 	<div data-control="media-manager" class="layout" data-alias="manager"
 		data-unique-id="MediaManager-manager"
 		data-delete-empty="삭제할 항목을 선택하세요."
 		data-delete-confirm="정말로 선택된 파일 삭제 하시겠습니까?"
+		data-download-empty="다운로드할 항목을 선택하세요."
+		data-download-confirm="정말로 선택된 파일 다운로드 하시겠습니까?"
 		data-move-empty="이동 항목을 선택하세요."
 		data-select-single-image="하나의 이미지를 선택하세요."
 		data-selection-not-image="선택한 항목이 이미지가 아닙니다."
@@ -76,8 +76,21 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<!-- New Folder Form -->
+		<script type="text/template" data-control="new-folder-template">
 		{#new_folder_form}
+		</script>
 	</div>
 </form>
+
+<div id="preparing-download" title="Preparing download..."
+	style="display: none;">
+	We are preparing your download, please wait...
+
+	<div class="ui-progressbar-value ui-corner-left ui-corner-right"
+		style="width: 100%; height: 22px; margin-top: 20px;"></div>
+</div>
+
+<div id="error-modal" title="Error" style="display: none;">There
+	was a problem generating your download file, please try again.</div>

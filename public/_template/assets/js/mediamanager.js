@@ -711,7 +711,8 @@
 		formData.append('path', this.$el.find('[data-type="current-folder"]')
 				.val())
 		formData.append('X_OCTOBER_FILEUPLOAD', this.options.uniqueId)
-		formData.append('X-October-Request-Handler', this.options.alias + '::onUpload')
+		formData.append('X-October-Request-Handler', this.options.alias
+				+ '::onUpload')
 	}
 	MediaManager.prototype.uploadCancelAll = function() {
 		this.dropzone.removeAllFiles(true)
@@ -828,6 +829,7 @@
 		$.oc.confirm(this.options.downloadConfirm, this
 				.proxy(this.downloadConfirmation))
 	}
+
 	MediaManager.prototype.downloadConfirmation = function(confirmed) {
 		if (!confirmed)
 			return null
@@ -841,15 +843,35 @@
 			})
 		}
 		var data = {
+			path : this.$el.find('[data-type="current-folder"]').val(),				
 			paths : paths
 		}
 		$.oc.stripeLoadIndicator.show()
-		// this.$form.request(this.options.alias + '::onDownload', {
-		// 	data : data
-		// }).always(function() {
-		// 	$.oc.stripeLoadIndicator.hide()
-		// }).done(this.proxy(this.afterNavigate))
-	}	
+		
+		$(function () {
+	        var $preparingFileModal = $("#preparing-download");
+	        $preparingFileModal.dialog({ modal: false });
+	        
+	        $.fileDownload(
+					'?manager.onDownload',
+					{
+						httpMethod : "POST",
+						data : data,
+			            successCallback: function (url) {
+			                $preparingFileModal.dialog('close');
+			            },
+			            failCallback: function (responseHtml, url) {
+			                $preparingFileModal.dialog('close');
+			                $("#error-modal").dialog({ modal: true });
+			            }			            
+					});
+	        		return false
+				})    
+				
+		$.oc.stripeLoadIndicator.hide();				
+		this.proxy(this.afterNavigate);
+	}
+
 	MediaManager.prototype.createFolder = function(ev) {
 		$(ev.target).popup(
 				{
@@ -974,7 +996,7 @@
 			break;
 		case 'download':
 			this.downloadItems()
-			break;			
+			break;
 		case 'create-folder':
 			this.createFolder(ev)
 			break;
@@ -1132,7 +1154,7 @@
 		deleteEmpty : 'Please select files to delete.',
 		deleteConfirm : 'Do you really want to delete the selected file(s)?',
 		downloadEmpty : 'Please select files to download.',
-		downloadConfirm : 'Do you really want to download the selected file(s)?',		
+		downloadConfirm : 'Do you really want to download the selected file(s)?',
 		moveEmpty : 'Please select files to move.',
 		selectSingleImage : 'Please select a single image.',
 		selectionNotImage : 'The selected item is not an image.',
