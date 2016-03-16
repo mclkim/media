@@ -258,7 +258,9 @@ class FtpLibraryItem extends Singleton {
 	}
 	public function getextension($file) {
 		// *** Get extension
-		$extension = strtolower ( strrchr ( $file, '.' ) );
+		$extension = strtolower ( pathinfo ( $file, PATHINFO_EXTENSION ) );
+		// $extension = strtolower ( strrchr ( $file, '.' ) );
+		// $extension = strtolower ( substr ( $file, strrpos ( $file, "." ) + 1 ) );
 		return $extension;
 	}
 }

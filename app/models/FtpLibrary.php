@@ -189,15 +189,13 @@ class FtpLibrary {
 			$isdir = ($listline ['dirorfile'] === 'd' || $listline ['dirfilename'] === $listline ['raw']);
 			$item = ($isdir) ? 'folder' : 'file';
 			
+			$path = rtrim ( $directory, '/' ); // TODO::경로를 다른 방법으로 처리
+			$name = $listline ['dirfilename'];
+			
 			// TODO::시간변환작업을 해야 하나??
 			$mtime = strtotime ( $listline ['mtime'] );
 			$stamp = ($mtime > time ()) ? strtotime ( "-1 year", $mtime ) : $mtime;
-			
-			$ext = pathinfo ( $listline ['dirfilename'], PATHINFO_EXTENSION ) ?  : 'unknown';
-			
-			$name = $listline ['dirfilename'];
-			$path = rtrim ( $directory, '/' ); // TODO::경로를 다른 방법으로 처리
-			
+			$ext = FtpLibraryItem::getInstance ()->getextension ( $name );
 			$type = FtpLibraryItem::getInstance ()->getFileType ( $item, $ext );
 			$icon = FtpLibraryItem::getInstance ()->itemTypeToIconClass ( $item, $type );
 			$byte = FtpLibraryItem::getInstance ()->byteconvert ( $listline ['size'] );
@@ -217,10 +215,9 @@ class FtpLibrary {
 						'group' => $listline ['group'],
 						'size' => $listline ['size'],
 						'byte' => '',
-						'date' => date ( "Y-m-d h:i A", $stamp ), // $listline ['mtime'],
+						'date' => date ( "Y-m-d h:i A", $stamp ),
 						'modified' => $stamp,
-						'raw' => $listline ['raw'],
-						'publicUrl' => $publicUrl . $encoded 
+						'raw' => $listline ['raw'] 
 				);
 			} else {
 				$files_list [] = array (
@@ -235,11 +232,11 @@ class FtpLibrary {
 						'group' => $listline ['group'],
 						'size' => $listline ['size'],
 						'byte' => $byte,
-						'date' => date ( "Y-m-d h:i A", $stamp ), // $listline ['mtime'],
+						'date' => date ( "Y-m-d h:i A", $stamp ),
 						'modified' => $stamp,
-						'base64' => base64_encode ( $name ),
 						'raw' => $listline ['raw'],
-						'publicUrl' => $publicUrl . $encoded 
+						'publicUrl' => $publicUrl . $encoded,
+						'base64' => base64_encode ( $name ) 
 				);
 			}
 		}
@@ -410,8 +407,7 @@ class FtpLibrary {
 		
 		// Set the mode if not specified
 		if ($mode === 'auto') {
-			$extension = pathinfo ( $file ['name'], PATHINFO_EXTENSION ) ?  : 'unknown';
-			// Get the file extension so we can set the upload type
+			$extension = FtpLibraryItem::getInstance ()->getextension ( $file ['name'] );
 			$mode = FtpLibraryItem::getInstance ()->getFileMode ( $extension );
 		}
 		
@@ -431,7 +427,7 @@ class FtpLibrary {
 		$file = FtpLibraryItem::getInstance ()->getbasename ( $fullpath );
 		// Set the mode if not specified
 		if ($mode === 'auto') {
-			$extension = pathinfo ( $file, PATHINFO_EXTENSION ) ?  : 'unknown';
+			$extension = FtpLibraryItem::getInstance ()->getextension ( $file );
 			$mode = FtpLibraryItem::getInstance ()->getFileMode ( $extension );
 		}
 		try {

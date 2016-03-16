@@ -35,7 +35,7 @@ class FtpManager extends FtpLibrary {
 				'isRootFolder' => $folder == self::FOLDER_ROOT,
 				'pathSegments' => $this->splitPathToSegments ( $folder ),
 				'viewMode' => $viewMode,
-				'thumbnailParams' => null,
+				'thumbnailParams' => $this->getThumbnailParams($viewMode),
 				'currentFilter' => $filter,
 				'sortBy' => $sortBy,
 				'searchMode' => $searchMode,
@@ -146,6 +146,12 @@ class FtpManager extends FtpLibrary {
 		
 		return true;
 	}
+
+    protected function getPlaceholderId($path,$lastModified)
+    {
+        return 'placeholder'.md5($path.'-'.$lastModified.uniqid(microtime()));
+    }
+
 	public function generateThumbnail($thumbnailInfo, $thumbnailParams = null) {
 		$publicUrl = '_thumbnail/';
 		$tempFilePath = null;
@@ -215,7 +221,7 @@ class FtpManager extends FtpLibrary {
 		
 		$thumbFile = 'thumb_' . $itemSignature . '_' . $thumbnailParams ['width'] . 'x' . $thumbnailParams ['height'] . '_' . $thumbnailParams ['mode'] . '.' . $thumbnailParams ['ext'];
 		
-		$partition = implode ( '/', array_slice ( str_split ( $itemSignature, 3 ), 0, 3 ) ) . '/';
+		// $partition = implode ( '/', array_slice ( str_split ( $itemSignature, 3 ), 0, 3 ) ) . '/';
 		$partition = '/';
 		
 		$result = $this->getThumbnailDirectory () . $partition . $thumbFile;

@@ -5,8 +5,7 @@
 		<div data-control="toolbar">
 			<a class="menu-toggle" href="javascript:;"> <i class="icon-bars"></i>
 				미디어
-			</a>
-{?false}
+			</a> {?false}
 			<ul class="nav">
 				<li class=""><a href="http://localhost/october/backend/backend">
 						<i class="icon-dashboard"></i>대시 보드
@@ -35,17 +34,17 @@
 						class="icon-cog"></i>설정
 				</a></li>
 			</ul>
-{/}			
+			{/}
 		</div>
 	</div>
 	<div class="toolbar-item" data-calculate-width>
 		<ul>
-{?false}			
+			<!-- {?false} -->
 			<li class="icon preview with-tooltip"><a
 				href="http://localhost/october" target="_blank" title="웹 사이트 미리보기">
 					<i class="icon-crosshairs"></i>
 			</a></li>
-{/}			
+			<!-- {/} -->
 			<li class="highlight account"><a href="javascript:;"
 				onclick="$.oc.layout.toggleAccountMenu(this)"> <img
 					src="//www.gravatar.com/avatar/2d6826023f031865b164c14f78254c0e?s=50&d=mm">
@@ -53,6 +52,7 @@
 			</a>
 				<div class="mainmenu-accountmenu">
 					<ul>
+						<!-- {?false} -->
 						<li><a
 							href="http://localhost/october/backend/backend/users/myaccount">
 								계정 </a></li>
@@ -63,7 +63,7 @@
 							href="http://localhost/october/backend/backend/editorpreferences">
 								편집기 환경설정 </a></li>
 						<li class="divider"></li>
-
+						<!-- {/} -->
 						<li><a
 							href="http://localhost/october/backend/backend/auth/signout">
 								로그 아웃 </a></li>

@@ -540,6 +540,7 @@
 	// Thumbnails
 	//
 	MediaManager.prototype.generateThumbnails = function() {
+		
 		this.thumbnailQueue = []
 		var placeholders = this.itemListElement
 				.querySelectorAll('[data-type="media-item"] div.image-placeholder')
@@ -558,7 +559,6 @@
 		var maxThumbnailQueueLength = 2, maxThumbnailBatchLength = 3
 		if (this.activeThumbnailQueueLength >= maxThumbnailQueueLength)
 			return null
-
 		for (var i = this.activeThumbnailQueueLength; i < maxThumbnailQueueLength
 				&& this.thumbnailQueue.length > 0; i++) {
 			var batch = []

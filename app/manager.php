@@ -85,6 +85,33 @@ class manager extends Controller {
 	}
 	public function onGenerateThumbnails() {
 		logger ( $_POST );
+		
+		$batch = $this->getParameter ( 'batch' );
+		
+		if (! is_array ( $batch )) {
+			return;
+		}
+		
+		$ftp = $this->container->get ( 'ftp' );
+		$model = new \App\Models\FtpManager ( $ftp );
+		$var = $model->prepareVars ( $this->container );
+		
+		$result = [ ];
+		$tpl = $this->container->get ( 'template' );
+		$tpl->define ( "thumbnail_image", "partials/thumbnail_image.html" );
+		$tpl->assign ( $var );
+		foreach ( $batch as $thumbnailInfo ) {
+			$tpl->assign ( $model->generateThumbnail ( $thumbnailInfo ) );
+			
+			$result [] = array (
+					'id' => $thumbnailInfo ['id'],
+					'markup' => $tpl->fetch ( "thumbnail_image" ) 
+			);
+		}
+		
+		return [ 
+				'generatedThumbnails' => $result 
+		];
 	}
 	public function onGetSidebarThumbnail() {
 		logger ( $_POST );
@@ -110,14 +137,12 @@ class manager extends Controller {
 		$thumbnailInfo ['lastModified'] = $lastModified;
 		$thumbnailInfo ['id'] = 'sidebar-thumbnail';
 		
-		$var = $model->generateThumbnail ( $thumbnailInfo, $thumbnailParams, true );
-		
 		$tpl = $this->container->get ( 'template' );
-		$tpl->assign ( $var );
 		$tpl->define ( "thumbnail_image", "partials/thumbnail_image.html" );
-		
+		$tpl->assign ( $model->generateThumbnail ( $thumbnailInfo, $thumbnailParams, true ) );
+
 		return [ 
-				'id' => 'sidebar-thumbnail',
+				'id' => $thumbnailInfo ['id'],
 				'markup' => $tpl->fetch ( "thumbnail_image" ) 
 		];
 	}

@@ -61,11 +61,23 @@
 				data-last-modified="{.date}" data-last-modified-ts="{.modified}"
 				data-public-url="{.publicUrl}" data-document-type="{.type}"
 				data-folder="{.path}" tabindex="0">
-				<div class="icon-container">
+				<div class="icon-container {.type}">
 					<div class="icon-wrapper">
 						<i class="{.icon}"></i>
 					</div>
-
+					{?.type == 'image'}
+					<div>
+						<div class="image-placeholder"
+							data-width="{thumbnailParams.width}"
+							data-height="{thumbnailParams.height}"
+							data-path="{.path}/{.name}" data-last-modified="{.modified}"
+							id="placeholder{.base64}">
+							<div class="icon-wrapper">
+								<i class="{.icon}"></i>
+							</div>
+						</div>
+					</div>
+					{/}
 				</div>
 				<div class="info">
 					<h4 title="{.name}">
