@@ -13,7 +13,8 @@ class index extends Controller {
 		$ftp = $this->container->get ( 'ftp' );
 		
 		$model = new \App\Models\FtpManager ( $ftp );
-		$var = $model->prepareVars ($this->container);
+		$var = $model->prepareVars ( $this->container );
+		$this->debug($var);
 		
 		//
 		$tpl = $this->container->get ( 'template' );
@@ -43,6 +44,6 @@ class index extends Controller {
 		) );
 		
 		$tpl->print_ ( 'index' );
-		flush ();
+		// flush ();
 	}
 }

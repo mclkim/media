@@ -4,7 +4,8 @@ namespace App\Models;
 
 use \Kaiser\Exception\ApplicationException;
 use \Kaiser\Exception\SystemException;
-use \Eventviva\ImageResize;
+use abeautifulsite\SimpleImage;
+use Kaiser;
 
 class FtpManager extends FtpLibrary {
 	const FOLDER_ROOT = '/';
@@ -27,15 +28,16 @@ class FtpManager extends FtpLibrary {
 			$items = $this->listFolderItems ( $folder, $filter, $sortBy );
 		else
 			$items = $this->findFiles ( $searchTerm, $filter, $sortBy );
-		
 		return array (
+				'session_key' => session_id (),
+				'token' => \Kaiser\Controller::getInstance ()->getToken (),
 				'baseUrl' => $container->get ( 'router' )->getBaseUrl (),
 				'items' => $items,
 				'currentFolder' => $folder,
 				'isRootFolder' => $folder == self::FOLDER_ROOT,
 				'pathSegments' => $this->splitPathToSegments ( $folder ),
 				'viewMode' => $viewMode,
-				'thumbnailParams' => $this->getThumbnailParams($viewMode),
+				'thumbnailParams' => $this->getThumbnailParams ( $viewMode ),
 				'currentFilter' => $filter,
 				'sortBy' => $sortBy,
 				'searchMode' => $searchMode,
@@ -146,12 +148,6 @@ class FtpManager extends FtpLibrary {
 		
 		return true;
 	}
-
-    protected function getPlaceholderId($path,$lastModified)
-    {
-        return 'placeholder'.md5($path.'-'.$lastModified.uniqid(microtime()));
-    }
-
 	public function generateThumbnail($thumbnailInfo, $thumbnailParams = null) {
 		$publicUrl = '_thumbnail/';
 		$tempFilePath = null;
@@ -208,13 +204,16 @@ class FtpManager extends FtpLibrary {
 		 * PHP must be enabled:
 		 * extension=php_mbstring.dll
 		 * extension=php_exif.dll
-		 *
-		 * @var unknown
 		 */
-		$image = new ImageResize ( $tempFilePath );
-		$image->resizeToBestFit ( $thumbnailParams ['width'], $thumbnailParams ['height'] );
-		// logger ( $thumbnailPath );
-		$image->save ( $thumbnailPath );
+		// $image = new ImageResize ( $tempFilePath );
+		// $image->resizeToBestFit ( $thumbnailParams ['width'], $thumbnailParams ['height'] );
+		// $image->save ( $thumbnailPath );
+		try {
+			$image = new SimpleImage ();
+			$image->load ( $tempFilePath )->best_fit ( $thumbnailParams ['width'], $thumbnailParams ['height'] )->save ( $thumbnailPath );
+		} catch ( Exception $e ) {
+			throw new SystemException ( $e->getMessage () );
+		}
 	}
 	protected function getThumbnailImagePath($thumbnailParams, $itemPath, $lastModified) {
 		$itemSignature = md5 ( $itemPath ) . $lastModified;
@@ -227,32 +226,6 @@ class FtpManager extends FtpLibrary {
 		$result = $this->getThumbnailDirectory () . $partition . $thumbFile;
 		
 		return $result;
-	}
-	/**
-	 * Makes directory and returns BOOL(TRUE) if exists OR made.
-	 *
-	 * @param $path Path
-	 *        	name
-	 * @return bool
-	 */
-	protected function rmkdir($path, $mode = 0755) {
-		$path = rtrim ( preg_replace ( array (
-				"/\\\\/",
-				"/\/{2,}/" 
-		), "/", $path ), "/" );
-		$e = explode ( "/", ltrim ( $path, "/" ) );
-		if (substr ( $path, 0, 1 ) == "/") {
-			$e [0] = "/" . $e [0];
-		}
-		$c = count ( $e );
-		$cp = $e [0];
-		for($i = 1; $i < $c; $i ++) {
-			if (! is_dir ( $cp ) && ! @mkdir ( $cp, $mode )) {
-				return false;
-			}
-			$cp .= "/" . $e [$i];
-		}
-		return @mkdir ( $path, $mode );
 	}
 	protected function absolutizePath($path) {
 		$path = str_replace ( array (

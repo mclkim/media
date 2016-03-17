@@ -199,8 +199,8 @@ class FtpLibrary {
 			$type = FtpLibraryItem::getInstance ()->getFileType ( $item, $ext );
 			$icon = FtpLibraryItem::getInstance ()->itemTypeToIconClass ( $item, $type );
 			$byte = FtpLibraryItem::getInstance ()->byteconvert ( $listline ['size'] );
-			$publicUrl = 'http://192.168.0.1:8000/list';
-			$encoded = implode ( "/", array_map ( "rawurlencode", explode ( "/", $path . "/" . $name ) ) );
+			$publicUrl = 'http://mclkim.ipdisk.co.kr:8000/list';
+			$urlencode = implode ( "/", array_map ( "rawurlencode", explode ( "/", $path . "/" . $name ) ) );
 			
 			if ($isdir) {
 				$folders_list [] = array (
@@ -235,7 +235,7 @@ class FtpLibrary {
 						'date' => date ( "Y-m-d h:i A", $stamp ),
 						'modified' => $stamp,
 						'raw' => $listline ['raw'],
-						'publicUrl' => $publicUrl . $encoded,
+						'publicUrl' => $publicUrl . $urlencode,
 						'base64' => base64_encode ( $name ) 
 				);
 			}
@@ -405,7 +405,6 @@ class FtpLibrary {
 	public function uploadFile($path = '/', $file, $mode = 'auto') {
 		$path = self::validatePath ( $path );
 		
-		// Set the mode if not specified
 		if ($mode === 'auto') {
 			$extension = FtpLibraryItem::getInstance ()->getextension ( $file ['name'] );
 			$mode = FtpLibraryItem::getInstance ()->getFileMode ( $extension );
@@ -433,7 +432,6 @@ class FtpLibrary {
 		try {
 			$this->ftp->chdir ( $path );
 			$mode = ($mode === 'ascii') ? FTP_ASCII : FTP_BINARY;
-			// Get the file
 			$this->ftp->get ( $tempfile, $file, $mode );
 		} catch ( Exception $e ) {
 			throw new FtpException ( $e->getMessage () );
@@ -474,7 +472,6 @@ class FtpLibrary {
 			// 선택한 파일을 압축하기
 			if (count ( $files )) {
 				foreach ( $files as $file ) {
-					// $v = base64_decode ( $v );
 					$this->zipAdd ( $zip, $file );
 				}
 			}
@@ -496,16 +493,38 @@ class FtpLibrary {
 	}
 	private function zipRecursive(&$zip, $path) {
 		if ($this->ftp->isDir ( $path ) && $this->ftp->chdir ( $path )) {
-			// Logger::debug ( $path );
+			// 파일압축하기
 			$result = $this->_lsFiles ( $path );
-			// Logger::debug ( $result );
 			foreach ( $result as $file ) {
-				$this->zipAdd ( $zip, rtrim ( $path, '/' ) . '/' . $file ['name'] );
+				$filename = rtrim ( $path, '/' ) . '/' . $file ['name'];
+				$this->zipAdd ( $zip, $filename );
 			}
+			
+			// 폴더 압축하기
 			$result = $this->_lsDirs ( $path );
-			// Logger::debug ( $result );
 			foreach ( $result as $dir ) {
-				$this->zipRecursive ( $zip, rtrim ( $path, '/' ) . '/' . $dir ['name'] );
+				$directory = rtrim ( $path, '/' ) . '/' . $dir ['name'];
+				$this->zipRecursive ( $zip, $directory );
+			}
+		}
+	}
+	protected function findRecursive(&$found, $path = '/', $pattern) {
+		if ($this->ftp->isDir ( $path ) && $this->ftp->chdir ( $path )) {
+			
+			// 파일찾기
+			$result = $this->_lsFiles ( $path );
+			foreach ( $result as $file ) {
+				if (preg_match ( "/$pattern/i", $file ['name'] )) {
+					$file ['path'] = $path;
+					array_push ( $found, $file );
+				}
+			}
+			
+			// 폴더찾기
+			$result = $this->_lsDirs ( $path );
+			foreach ( $result as $dir ) {
+				$directory = rtrim ( $path, '/' ) . '/' . $dir ['name'];
+				$this->findRecursive ( $found, $directory, $pattern );
 			}
 		}
 	}
@@ -571,8 +590,6 @@ class FtpLibrary {
 		}
 		
 		$itemList = $result;
-	}
-	protected function getStorageDisk() {
 	}
 	protected function pathMatchesSearch($path, $words) {
 	}
