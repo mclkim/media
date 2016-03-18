@@ -48,7 +48,7 @@ class manager extends Controller {
 		
 		$model->setSearchTerm ( $search );
 		
-		$var = $model->prepareVars ( $this->container );
+		$var = $model->prepareVars ();
 		
 		//
 		$tpl = $this->container->get ( 'template' );
@@ -70,7 +70,7 @@ class manager extends Controller {
 		$model = new \App\Models\FtpManager ( $ftp );
 		
 		$model->setCurrentFolder ( $path );
-		$var = $model->prepareVars ( $this->container );
+		$var = $model->prepareVars ();
 		
 		//
 		$tpl = $this->container->get ( 'template' );
@@ -94,7 +94,7 @@ class manager extends Controller {
 		
 		$ftp = $this->container->get ( 'ftp' );
 		$model = new \App\Models\FtpManager ( $ftp );
-		$var = $model->prepareVars ( $this->container );
+		$var = $model->prepareVars ();
 		
 		$result = [ ];
 		$tpl = $this->container->get ( 'template' );
@@ -140,7 +140,7 @@ class manager extends Controller {
 		$tpl = $this->container->get ( 'template' );
 		$tpl->define ( "thumbnail_image", "partials/thumbnail_image.html" );
 		$tpl->assign ( $model->generateThumbnail ( $thumbnailInfo, $thumbnailParams, true ) );
-
+		
 		return [ 
 				'id' => $thumbnailInfo ['id'],
 				'markup' => $tpl->fetch ( "thumbnail_image" ) 
@@ -158,7 +158,7 @@ class manager extends Controller {
 		$model->setViewMode ( $viewMode );
 		$model->setCurrentFolder ( $path );
 		
-		$var = $model->prepareVars ( $this->container );
+		$var = $model->prepareVars ();
 		
 		//
 		$tpl = $this->container->get ( 'template' );
@@ -185,7 +185,7 @@ class manager extends Controller {
 		$model->setFilter ( $filter );
 		$model->setCurrentFolder ( $path );
 		
-		$var = $model->prepareVars ( $this->container );
+		$var = $model->prepareVars ();
 		
 		//
 		$tpl = $this->container->get ( 'template' );
@@ -210,7 +210,7 @@ class manager extends Controller {
 		$model->setSortBy ( $sortBy );
 		$model->setCurrentFolder ( $path );
 		
-		$var = $model->prepareVars ( $this->container );
+		$var = $model->prepareVars ();
 		
 		//
 		$tpl = $this->container->get ( 'template' );
@@ -251,7 +251,7 @@ class manager extends Controller {
 		if (count ( $filesToDelete ) > 0)
 			$model->deleteFiles ( $filesToDelete );
 		
-		$var = $model->prepareVars ( $this->container );
+		$var = $model->prepareVars ();
 		
 		$tpl = $this->container->get ( 'template' );
 		$tpl->assign ( $var );
@@ -358,7 +358,7 @@ class manager extends Controller {
 		}
 		
 		//
-		$var = $model->prepareVars ( $this->container );
+		$var = $model->prepareVars ();
 		
 		$tpl = $this->container->get ( 'template' );
 		$tpl->assign ( $var );
@@ -388,7 +388,7 @@ class manager extends Controller {
 		$model->makeFolder ( $newFolderPath );
 		
 		//
-		$var = $model->prepareVars ( $this->container );
+		$var = $model->prepareVars ();
 		
 		$tpl = $this->container->get ( 'template' );
 		$tpl->assign ( $var );
@@ -453,7 +453,7 @@ class manager extends Controller {
 		}
 		
 		//
-		$var = $model->prepareVars ( $this->container );
+		$var = $model->prepareVars ();
 		
 		$tpl = $this->container->get ( 'template' );
 		$tpl->assign ( $var );

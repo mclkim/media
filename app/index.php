@@ -9,12 +9,13 @@ class index extends Controller {
 	}
 	function execute() {
 		$this->debug ( $_SESSION );
+		logger ( base_path () );
 		
 		$ftp = $this->container->get ( 'ftp' );
 		
 		$model = new \App\Models\FtpManager ( $ftp );
-		$var = $model->prepareVars ( $this->container );
-		$this->debug($var);
+		$var = $model->prepareVars ();
+		$this->debug ( $var );
 		
 		//
 		$tpl = $this->container->get ( 'template' );

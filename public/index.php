@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ALL & ~E_NOTICE);
+error_reporting ( E_ALL & ~ E_NOTICE );
 /**
  * |-------------------------------------------------------------------
  * |주 경로 상수를 설정
@@ -57,10 +57,10 @@ require_once BASE_PATH . '/app/dependencies.php';
  * |Instantiate the app
  * |-------------------------------------------------------------------
  */
-$app = new Kaiser\App ( $container, BASE_PATH );
-
+$app = new Kaiser\App ( $container );
+$app->setBasePath ( BASE_PATH );
 $app->setAppDir ( [ 
-		__DIR__ . '/../app' 
+		BASE_PATH . '/app' 
 ] );
 
 /**

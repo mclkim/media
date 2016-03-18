@@ -1,5 +1,7 @@
 <?php
-return [
+return [ 
+		'enableCsrfProtection' => true,
+		
 		// db settings
 		'db' => [ 
 				'driver' => 'mysql', // Db driver
@@ -9,9 +11,9 @@ return [
 				'username' => 'username',
 				'password' => 'password',
 				'charset' => 'utf8', // Optional
-				'collation' => 'utf8_unicode_ci', // Optional
-		], 
-		   
+				'collation' => 'utf8_unicode_ci' 
+		],
+		
 		// ftp settings
 		'ftp' => [ 
 				'scheme' => 'ftp',
@@ -31,6 +33,5 @@ return [
 				'max_file_count' => 20,
 				'default_expire' => 365,
 				'default_size' => 100 
-		]
-		
+		] 
 ];

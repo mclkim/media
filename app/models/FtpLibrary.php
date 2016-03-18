@@ -534,10 +534,10 @@ class FtpLibrary {
 		$path = str_replace ( '\\', '/', $path );
 		$path = '/' . trim ( $path, '/' );
 		
-		if ($normalizeOnly)
-			
+		if ($normalizeOnly) {
 			if (strpos ( $path, '..' ) !== false)
 				throw new ApplicationException ( "지정된 잘못된 파일 경로: '$path'." );
+		}
 		
 		if (strpos ( $path, './' ) !== false || strpos ( $path, '//' ) !== false)
 			throw new ApplicationException ( "지정된 잘못된 파일 경로: '$path'." );

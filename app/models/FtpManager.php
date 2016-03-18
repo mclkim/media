@@ -16,7 +16,7 @@ class FtpManager extends FtpLibrary {
 	const SELECTION_MODE_FIXED_RATIO = 'fixed-ratio';
 	const SELECTION_MODE_FIXED_SIZE = 'fixed-size';
 	const FILTER_EVERYTHING = 'everything';
-	public function prepareVars($container) {
+	public function prepareVars() {
 		$folder = $this->getCurrentFolder ();
 		$viewMode = $this->getViewMode ();
 		$filter = $this->getFilter ();
@@ -28,11 +28,11 @@ class FtpManager extends FtpLibrary {
 			$items = $this->listFolderItems ( $folder, $filter, $sortBy );
 		else
 			$items = $this->findFiles ( $searchTerm, $filter, $sortBy );
+		
 		return array (
+				'token' => app ()->getToken (),
 				'session_key' => session_id (),
-				'token' => \Kaiser\Controller::getInstance ()->getToken (),
-				'baseUrl' => $container->get ( 'router' )->getBaseUrl (),
-				'items' => $items,
+				'baseUrl' => app ( 'router' )->getBaseUrl (),
 				'currentFolder' => $folder,
 				'isRootFolder' => $folder == self::FOLDER_ROOT,
 				'pathSegments' => $this->splitPathToSegments ( $folder ),
@@ -42,7 +42,8 @@ class FtpManager extends FtpLibrary {
 				'sortBy' => $sortBy,
 				'searchMode' => $searchMode,
 				'searchTerm' => $searchTerm,
-				'sidebarVisible' => $this->getSidebarVisible () 
+				'sidebarVisible' => $this->getSidebarVisible (),
+				'items' => $items 
 		);
 	}
 	protected function listFolderItems($folder, $filter, $sortBy) {
@@ -201,13 +202,16 @@ class FtpManager extends FtpLibrary {
 	}
 	protected function resizeImage($tempFilePath, $thumbnailParams, $thumbnailPath) {
 		/**
+		 * https://github.com/eventviva/php-image-resize
+		 * 
 		 * PHP must be enabled:
 		 * extension=php_mbstring.dll
 		 * extension=php_exif.dll
+		 *
+		 * // $image = new ImageResize ( $tempFilePath );
+		 * // $image->resizeToBestFit ( $thumbnailParams ['width'], $thumbnailParams ['height'] );
+		 * // $image->save ( $thumbnailPath );
 		 */
-		// $image = new ImageResize ( $tempFilePath );
-		// $image->resizeToBestFit ( $thumbnailParams ['width'], $thumbnailParams ['height'] );
-		// $image->save ( $thumbnailPath );
 		try {
 			$image = new SimpleImage ();
 			$image->load ( $tempFilePath )->best_fit ( $thumbnailParams ['width'], $thumbnailParams ['height'] )->save ( $thumbnailPath );
