@@ -45,8 +45,8 @@ $container ['ftp'] = function ($c) {
 	// Opens an FTP connection to the specified host
 	$ftp->connect ( $c ['config']->get ( 'ftp.host' ) );
 	
+	// Login with username and password
 	if (! empty ( $c ['config']->get ( 'ftp.user' ) ) && ! empty ( $c ['config']->get ( 'ftp.pass' ) )) {
-		// Login with username and password
 		$ftp->login ( $c ['config']->get ( 'ftp.user' ), $c ['config']->get ( 'ftp.pass' ) );
 	}
 	

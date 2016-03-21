@@ -5,7 +5,6 @@ namespace App\Models;
 use \Kaiser\Exception\ApplicationException;
 use \Kaiser\Exception\SystemException;
 use abeautifulsite\SimpleImage;
-use Kaiser;
 
 class FtpManager extends FtpLibrary {
 	const FOLDER_ROOT = '/';
@@ -16,6 +15,25 @@ class FtpManager extends FtpLibrary {
 	const SELECTION_MODE_FIXED_RATIO = 'fixed-ratio';
 	const SELECTION_MODE_FIXED_SIZE = 'fixed-size';
 	const FILTER_EVERYTHING = 'everything';
+	function __construct($ftp) {
+		parent::__construct ( $ftp );
+		
+		// Login with username and password
+		if (! empty ( $_SESSION ['user'] ['username'] ) && ! empty ( $_SESSION ['user'] ['password'] )) {
+			$ftp->login ( $_SESSION ['user'] ['username'], $_SESSION ['user'] ['password'] );
+		}
+	}
+	public function password_verify($username, $password) {
+		if (empty ( $username ) || empty ( $password ))
+			return false;
+		
+		try {
+			$ret = $this->ftp->login ( $username, $password );
+			return isset ( $ret ) ? $ret : false;
+		} catch ( \Exception $e ) {
+			return false;
+		}
+	}
 	public function prepareVars() {
 		$folder = $this->getCurrentFolder ();
 		$viewMode = $this->getViewMode ();
@@ -203,7 +221,7 @@ class FtpManager extends FtpLibrary {
 	protected function resizeImage($tempFilePath, $thumbnailParams, $thumbnailPath) {
 		/**
 		 * https://github.com/eventviva/php-image-resize
-		 * 
+		 *
 		 * PHP must be enabled:
 		 * extension=php_mbstring.dll
 		 * extension=php_exif.dll

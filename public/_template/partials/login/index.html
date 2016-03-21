@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+<script src="_template/assets/js/jquery-1.12.0.min.js?v313"></script>
+<link rel="stylesheet" href="_template/partials/login/css/style.css">
+</head>
+<body>
+	<div class="container">
+		<div id="login-form">
+			<h3>Login</h3>
+			<fieldset>
+				<form id="login_form" action="javascript:void(0);" method="get">
+					<!-- token -->
+					<input type="hidden" name="token" value="{token}">
+					<!-- returnURI -->
+					<input type="hidden" name="returnURI" value="{=returnURI}" />
+					<!-- Id -->
+					<input type="text" id="{=userField}" name="{=userField}" required
+						value="Id" onBlur="if(this.value=='')this.value='Id'"
+						onFocus="if(this.value=='Id')this.value='' ">
+					<!-- JS because of IE support; better: placeholder="Email" -->
+					<input type="password" id="{=passField}" name="{=passField}"
+						required value="Password"
+						onBlur="if(this.value=='')this.value='Password'"
+						onFocus="if(this.value=='Password')this.value='' ">
+					<!-- JS because of IE support; better: placeholder="Password" -->
+					<input id='login_bt' type="submit" value="Login">
+					<footer class="clearfix">
+						<p>
+							<span class="info">?</span><a href="#">Forgot Password</a>
+						</p>
+					</footer>
+				</form>
+			</fieldset>
+		</div>
+		<!-- end login-form -->
+	</div>
+</body>
+
+<script type="text/javascript">
+	$(document).on("click", '#login_bt', function() {
+		$.ajax({
+			url : "?login.auth",
+			type : 'POST',
+			data : $("#login_form").serialize(),
+			success : function(res) {
+				res = $.parseJSON(res);
+				if (res.code == 0) {
+					alert(res.message);
+				} else if (res.code == 1) {
+					window.location = res.value;
+					//document.location.href = res.value;
+				} else {
+					alert('Problem with sql query');
+				}
+				return false;
+			}
+		});
+		return false;
+	});
+</script>
+
+</html>

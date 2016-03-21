@@ -5,17 +5,17 @@ use \Kaiser\Controller;
  */
 class index extends Controller {
 	protected function requireLogin() {
-		return false;
+		return true;
 	}
 	function execute() {
 		$this->debug ( $_SESSION );
-		logger ( base_path () );
+		// logger ( base_path () );
 		
 		$ftp = $this->container->get ( 'ftp' );
 		
 		$model = new \App\Models\FtpManager ( $ftp );
 		$var = $model->prepareVars ();
-		$this->debug ( $var );
+		// $this->debug ( $var );
 		
 		//
 		$tpl = $this->container->get ( 'template' );
@@ -23,28 +23,28 @@ class index extends Controller {
 		$tpl->assign ( $var );
 		
 		$tpl->define ( array (
-				"index" => "layouts/default.html",
-				"head" => "layouts/head.html",
-				"mainmenu" => "layouts/mainmenu.html",
-				"sidepanel_flyout" => "",
-				"sidenavi" => "",
 				"body" => "partials/body.html",
-				"toolbar" => "partials/toolbar.html",
-				"view_mode_buttons" => "partials/view_mode_buttons.html",
-				"upload_progress" => "partials/upload_progress.html",
-				"left_sidebar" => "partials/left_sidebar.html",
-				"filters" => "partials/filters.html",
-				"sorting" => "partials/sorting.html",
-				"folder_toolbar" => "partials/folder_toolbar.html",
-				"folder_path" => "partials/folder_path.html",
-				"item_list" => "partials/item_list.html",
-				"right_sidebar" => "partials/right_sidebar.html",
 				"bottom_toolbar" => "partials/bottom_toolbar.html",
+				"filters" => "partials/filters.html",
+				"flash_messages" => "",
+				"folder_path" => "partials/folder_path.html",
+				"folder_toolbar" => "partials/folder_toolbar.html",
+				"head" => "layouts/head.html",
+				"index" => "layouts/default.html",
+				"item_list" => "partials/item_list.html",
+				"left_sidebar" => "partials/left_sidebar.html",
+				"mainmenu" => "layouts/mainmenu.html",
 				"new_folder_form" => "partials/new_folder_form.html",
-				"flash_messages" => "" 
+				"right_sidebar" => "partials/right_sidebar.html",
+				"sidenavi" => "",
+				"sidepanel_flyout" => "",
+				"sorting" => "partials/sorting.html",
+				"toolbar" => "partials/toolbar.html",
+				"upload_progress" => "partials/upload_progress.html",
+				"view_mode_buttons" => "partials/view_mode_buttons.html" 
 		) );
 		
 		$tpl->print_ ( 'index' );
-		// flush ();
+		flush ();
 	}
 }

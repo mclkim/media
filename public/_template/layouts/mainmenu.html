@@ -48,7 +48,7 @@
 			<li class="highlight account"><a href="javascript:;"
 				onclick="$.oc.layout.toggleAccountMenu(this)"> <img
 					src="//www.gravatar.com/avatar/2d6826023f031865b164c14f78254c0e?s=50&d=mm">
-					<span class="hidden-xs"> Admin Person </span>
+					<span class="hidden-xs"> Welcome,{_SESSION.user.username} </span>
 			</a>
 				<div class="mainmenu-accountmenu">
 					<ul>
@@ -64,9 +64,7 @@
 								편집기 환경설정 </a></li>
 						<li class="divider"></li>
 						<!-- {/} -->
-						<li><a
-							href="http://localhost/october/backend/backend/auth/signout">
-								로그 아웃 </a></li>
+						<li><a href="?logout"> 로그 아웃 </a></li>
 					</ul>
 				</div></li>
 		</ul>
