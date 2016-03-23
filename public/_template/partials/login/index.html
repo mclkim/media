@@ -15,13 +15,13 @@
 					<!-- token -->
 					<input type="hidden" name="token" value="{token}">
 					<!-- returnURI -->
-					<input type="hidden" name="returnURI" value="{=returnURI}" />
+					<input type="hidden" name="returnURI" value="{returnURI}" />
 					<!-- Id -->
-					<input type="text" id="{=userField}" name="{=userField}" required
+					<input type="text" id="{userField}" name="{userField}" required
 						value="Id" onBlur="if(this.value=='')this.value='Id'"
 						onFocus="if(this.value=='Id')this.value='' ">
 					<!-- JS because of IE support; better: placeholder="Email" -->
-					<input type="password" id="{=passField}" name="{=passField}"
+					<input type="password" id="{passField}" name="{passField}"
 						required value="Password"
 						onBlur="if(this.value=='')this.value='Password'"
 						onFocus="if(this.value=='Password')this.value='' ">
