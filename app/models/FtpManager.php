@@ -16,12 +16,11 @@ class FtpManager extends FtpLibrary {
 	const SELECTION_MODE_FIXED_SIZE = 'fixed-size';
 	const FILTER_EVERYTHING = 'everything';
 	function __construct($ftp) {
-		parent::__construct ( $ftp );
-		
 		// Login with username and password
 		if (! empty ( $_SESSION ['user'] ['username'] ) && ! empty ( $_SESSION ['user'] ['password'] )) {
 			$ftp->login ( $_SESSION ['user'] ['username'], $_SESSION ['user'] ['password'] );
 		}
+		parent::__construct ( $ftp );
 	}
 	public function password_verify($username, $password) {
 		if (empty ( $username ) || empty ( $password ))
