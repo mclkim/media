@@ -4,6 +4,9 @@ use \Kaiser\Controller;
  * http://localhost/test/public/?index
  */
 class index extends Controller {
+	protected function requireLogin() {
+		return false;
+	}
 	function execute() {
 		$this->debug ( $_SESSION );
 		// logger ( base_path () );

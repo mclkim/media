@@ -18,7 +18,8 @@ class FtpManager extends FtpLibrary {
 	function __construct($ftp) {
 		// Login with username and password
 		if (! empty ( $_SESSION ['user'] ['username'] ) && ! empty ( $_SESSION ['user'] ['password'] )) {
-			$ftp->login ( $_SESSION ['user'] ['username'], $_SESSION ['user'] ['password'] );
+// 			$ret = $ftp->login ( $_SESSION ['user'] ['username'], $_SESSION ['user'] ['password'] );
+			logger ( $ret );
 		}
 		parent::__construct ( $ftp );
 	}

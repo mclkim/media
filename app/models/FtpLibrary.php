@@ -181,7 +181,7 @@ class FtpLibrary {
 		
 		foreach ( $list as $line ) {
 			$listline = $this->parseScanLine ( $line );
-			
+logger($listline);			
 			if ($listline ['raw'] == "") {
 				continue;
 			}
