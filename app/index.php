@@ -5,7 +5,7 @@ use \Kaiser\Controller;
  */
 class index extends Controller {
 	protected function requireLogin() {
-		return false;
+		return true;
 	}
 	function execute() {
 		$this->debug ( $_SESSION );
@@ -19,9 +19,7 @@ class index extends Controller {
 		
 		//
 		$tpl = $this->container->get ( 'template' );
-		
 		$tpl->assign ( $var );
-		
 		$tpl->define ( array (
 				"body" => "partials/body.html",
 				"bottom_toolbar" => "partials/bottom_toolbar.html",

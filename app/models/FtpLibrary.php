@@ -162,13 +162,16 @@ class FtpLibrary {
 		return $listline;
 	}
 	protected function parseRawList($directory = null, $recursive = false) {
+// 		logger ( var_export ( $this->ftp ) );
+// 		logger ( $directory );
+// 		logger ( $recursive );
 		try {
 			$list = $this->ftp->rawlist ( $directory, $recursive );
 		} catch ( Exception $e ) {
 			throw new FtpException ( $e->getMessage () );
 			return false;
 		}
-		
+		logger ( $list );
 		if (! is_array ( $list )) {
 			return array (
 					'folders' => array (),
@@ -181,7 +184,7 @@ class FtpLibrary {
 		
 		foreach ( $list as $line ) {
 			$listline = $this->parseScanLine ( $line );
-	
+			
 			if ($listline ['raw'] == "") {
 				continue;
 			}
@@ -306,7 +309,7 @@ class FtpLibrary {
 		$words = explode ( ' ', strtolower ( $searchTerm ) );
 		$result = [ ];
 		
-		$findInFolder = function ($folder) use(&$findInFolder, $words, &$result, $sortBy, $filter) {
+		$findInFolder = function ($folder) use (&$findInFolder, $words, &$result, $sortBy, $filter) {
 			$folderContents = $this->listFolderContents ( $folder, $sortBy, $filter );
 			
 			foreach ( $folderContents as $item ) {
@@ -565,7 +568,7 @@ class FtpLibrary {
 		$files = [ ];
 		$folders = [ ];
 		
-		usort ( $itemList, function ($a, $b) use($sortBy) {
+		usort ( $itemList, function ($a, $b) use ($sortBy) {
 			switch ($sortBy) {
 				case self::SORT_BY_NAME :
 					return strcasecmp ( $a [$sortBy], $b [$sortBy] );

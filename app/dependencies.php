@@ -48,6 +48,11 @@ $container ['ftp'] = function ($c) {
 	// Login with username and password
 	if (! empty ( $c ['config']->get ( 'ftp.user' ) ) && ! empty ( $c ['config']->get ( 'ftp.pass' ) )) {
 		$ftp->login ( $c ['config']->get ( 'ftp.user' ), $c ['config']->get ( 'ftp.pass' ) );
+	}	
+
+	//
+	elseif (! empty ( $_SESSION ['user'] ['username'] ) && ! empty ( $_SESSION ['user'] ['password'] )) {
+		$ftp->login ( $_SESSION ['user'] ['username'], $_SESSION ['user'] ['password'] );
 	}
 	
 	$ftp->pasv ( $c ['config']->get ( 'ftp.passive' ) );

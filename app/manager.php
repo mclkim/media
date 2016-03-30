@@ -10,7 +10,7 @@ use Apfelbox\FileDownload\FileDownload;
  */
 class manager extends Controller {
 	protected function requireLogin() {
-		return false;
+		return true;
 	}
 	public function onUpload() {
 		logger ( $_POST );

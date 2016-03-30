@@ -15,24 +15,16 @@ class FtpManager extends FtpLibrary {
 	const SELECTION_MODE_FIXED_RATIO = 'fixed-ratio';
 	const SELECTION_MODE_FIXED_SIZE = 'fixed-size';
 	const FILTER_EVERYTHING = 'everything';
-	function __construct($ftp) {
-		// Login with username and password
-		if (! empty ( $_SESSION ['user'] ['username'] ) && ! empty ( $_SESSION ['user'] ['password'] )) {
-// 			$ret = $ftp->login ( $_SESSION ['user'] ['username'], $_SESSION ['user'] ['password'] );
-			logger ( $ret );
-		}
-		parent::__construct ( $ftp );
-	}
 	public function password_verify($username, $password) {
-		if (empty ( $username ) || empty ( $password ))
-			return false;
-		
-		try {
-			$ret = $this->ftp->login ( $username, $password );
-			return isset ( $ret ) ? $ret : false;
-		} catch ( \Exception $e ) {
-			return false;
-		}
+		logger ( 'password_verify' );
+		/**
+		 * if ($result === false) {
+		 * throw new FtpException('Login incorrect');
+		 * }
+		 * return $result;
+		 */
+		$result = $this->ftp->login ( $username, $password );
+		return ($result) ?: true;
 	}
 	public function prepareVars() {
 		$folder = $this->getCurrentFolder ();
