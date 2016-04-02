@@ -3,8 +3,8 @@
 		data-request="manager::onApplyName" data-stripe-load-indicator="1"
 		id="media-rename-popup-form"
 		data-request-success="$el.trigger('close.oc.popup'); $('#MediaManager-manager-item-list').trigger('mediarefresh');">
-		<!-- token -->
-		<input name="token" type="hidden" value="{token}">
+		<!-- csrf_token -->
+		<input type="hidden" name="csrf_token" value="{csrf_token}">
 		<!-- session_key -->
 		<input name="session_key" type="hidden" value="{session_key}">
 		<!-- modal-header -->

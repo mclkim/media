@@ -708,6 +708,10 @@
 		this.refresh()
 	}
 	MediaManager.prototype.uploadSending = function(file, xhr, formData) {
+		var token = $('meta[name="csrf-token"]').attr('content');
+		if (token) {
+		xhr.setRequestHeader('X-CSRF-TOKEN', token);
+		}
 		formData.append('path', this.$el.find('[data-type="current-folder"]')
 				.val())
 		formData.append('X_OCTOBER_FILEUPLOAD', this.options.uniqueId)

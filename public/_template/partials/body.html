@@ -1,7 +1,7 @@
 <form method="POST" action="{baseUrl}" accept-charset="UTF-8"
 	class="layout" onsubmit="return false">
-	<!-- token -->
-	<input name="token" type="hidden" value="{token}">
+	<!-- csrf_token -->
+	<input type="hidden" name="csrf_token" value="{csrf_token}">
 	<!-- session_key -->
 	<input name="session_key" type="hidden" value="{session_key}">
 	<div data-control="media-manager" class="layout" data-alias="manager"

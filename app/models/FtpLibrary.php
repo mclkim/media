@@ -162,16 +162,12 @@ class FtpLibrary {
 		return $listline;
 	}
 	protected function parseRawList($directory = null, $recursive = false) {
-// 		logger ( var_export ( $this->ftp ) );
-// 		logger ( $directory );
-// 		logger ( $recursive );
 		try {
 			$list = $this->ftp->rawlist ( $directory, $recursive );
 		} catch ( Exception $e ) {
 			throw new FtpException ( $e->getMessage () );
 			return false;
 		}
-		logger ( $list );
 		if (! is_array ( $list )) {
 			return array (
 					'folders' => array (),
@@ -382,8 +378,8 @@ class FtpLibrary {
 		$path = self::validatePath ( $path );
 		return $this->ftp->put ( $path, $contents );
 	}
-	public function moveFile($originalPath, $newPath, $isRename = false) {
-		$oldPath = self::validatePath ( $originalPath );
+	public function moveFile($oldPath, $newPath, $isRename = false) {
+		$oldPath = self::validatePath ( $oldPath );
 		$newPath = self::validatePath ( $newPath );
 		return $this->ftp->rename ( $oldPath, $newPath );
 	}

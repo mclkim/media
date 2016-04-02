@@ -13,7 +13,9 @@ class manager extends Controller {
 		return true;
 	}
 	public function onUpload() {
+		logger ( 'onUpload' );
 		logger ( $_POST );
+		logger ( $_FILES );
 		
 		$config = $this->container->get ( 'config' );
 		$ftp = $this->container->get ( 'ftp' );
@@ -39,6 +41,7 @@ class manager extends Controller {
 		}
 	}
 	public function onSearch() {
+		logger ( 'onSearch' );
 		logger ( $_POST );
 		
 		$search = $this->getParameter ( 'search' );
@@ -62,6 +65,7 @@ class manager extends Controller {
 		];
 	}
 	function onGoToFolder() {
+		logger ( 'onGoToFolder' );
 		logger ( $_POST );
 		
 		$path = $this->getParameter ( 'path' );
@@ -84,6 +88,7 @@ class manager extends Controller {
 		];
 	}
 	public function onGenerateThumbnails() {
+		logger ( 'onGenerateThumbnails' );
 		logger ( $_POST );
 		
 		$batch = $this->getParameter ( 'batch' );
@@ -114,6 +119,7 @@ class manager extends Controller {
 		];
 	}
 	public function onGetSidebarThumbnail() {
+		logger ( 'onGetSidebarThumbnail' );
 		logger ( $_POST );
 		
 		$path = $this->getParameter ( 'path' );
@@ -147,6 +153,7 @@ class manager extends Controller {
 		];
 	}
 	public function onChangeView() {
+		logger ( 'onChangeView' );
 		logger ( $_POST );
 		
 		$viewMode = $this->getParameter ( 'view' );
@@ -174,6 +181,7 @@ class manager extends Controller {
 		];
 	}
 	public function onSetFilter() {
+		logger ( 'onSetFilter' );
 		logger ( $_POST );
 		
 		$filter = $this->getParameter ( 'filter' );
@@ -199,6 +207,7 @@ class manager extends Controller {
 		];
 	}
 	public function onSetSorting() {
+		logger ( 'onSetSorting' );
 		logger ( $_POST );
 		
 		$sortBy = $this->getParameter ( 'sortBy' );
@@ -224,6 +233,7 @@ class manager extends Controller {
 		];
 	}
 	public function onDelete() {
+		logger ( 'onDelete' );
 		logger ( $_POST );
 		
 		$paths = $this->getParameter ( 'paths' );
@@ -262,6 +272,7 @@ class manager extends Controller {
 		];
 	}
 	public function onDownload() {
+		logger ( 'onDownload' );
 		logger ( $_POST );
 		
 		$paths = $this->getParameter ( 'paths' );
@@ -319,6 +330,7 @@ class manager extends Controller {
 		}
 	}
 	public function onLoadRenamePopup() {
+		logger ( 'onLoadRenamePopup' );
 		logger ( $_POST );
 		
 		$path = $this->getParameter ( 'path' );
@@ -335,6 +347,7 @@ class manager extends Controller {
 		return $tpl->fetch ( "rename_form" );
 	}
 	public function onApplyName() {
+		logger ( 'onApplyName' );
 		logger ( $_POST );
 		
 		$name = $this->getParameter ( 'name' );
@@ -369,6 +382,7 @@ class manager extends Controller {
 		];
 	}
 	public function onCreateFolder() {
+		logger ( 'onCreateFolder' );
 		logger ( $_POST );
 		
 		$name = $this->getParameter ( 'name' );
@@ -399,6 +413,7 @@ class manager extends Controller {
 		];
 	}
 	public function onLoadMovePopup() {
+		logger ( 'onLoadMovePopup' );
 		logger ( $_POST );
 		
 		$exclude = $this->getParameter ( 'exclude', [ ] );
@@ -435,6 +450,7 @@ class manager extends Controller {
 		return $tpl->fetch ( "move_form" );
 	}
 	public function onMoveItems() {
+		logger ( 'onMoveItems' );
 		logger ( $_POST );
 		
 		$dest = $this->getParameter ( 'dest' );
@@ -464,6 +480,7 @@ class manager extends Controller {
 		];
 	}
 	public function onSetSidebarVisible() {
+		logger ( 'onSetSidebarVisible' );
 		logger ( $_POST );
 		
 		$visible = $this->getParameter ( 'visible' );
@@ -473,6 +490,8 @@ class manager extends Controller {
 		$model->setSidebarVisible ( $visible );
 	}
 	public function onLoadPopup() {
+		logger ( 'onLoadPopup' );
+		logger ( $_POST );
 	}
 	protected function validateFileName($name) {
 		if (! preg_match ( '/^[0-9a-z\.\s_\-]+$/i', $name )) {

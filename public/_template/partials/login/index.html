@@ -12,8 +12,8 @@
 			<h3>Login</h3>
 			<fieldset>
 				<form id="login_form" action="javascript:void(0);" method="get">
-					<!-- token -->
-					<input type="hidden" name="token" value="{token}">
+					<!-- csrf_token -->
+					<input type="hidden" name="csrf_token" value="{csrf_token}">
 					<!-- returnURI -->
 					<input type="hidden" name="returnURI" value="{returnURI}" />
 					<!-- Id -->
@@ -21,9 +21,8 @@
 						value="Id" onBlur="if(this.value=='')this.value='Id'"
 						onFocus="if(this.value=='Id')this.value='' ">
 					<!-- JS because of IE support; better: placeholder="Email" -->
-					<input type="password" id="{passField}" name="{passField}"
-						required value="Password"
-						onBlur="if(this.value=='')this.value='Password'"
+					<input type="password" id="{passField}" name="{passField}" required
+						value="Password" onBlur="if(this.value=='')this.value='Password'"
 						onFocus="if(this.value=='Password')this.value='' ">
 					<!-- JS because of IE support; better: placeholder="Password" -->
 					<input id='login_bt' type="submit" value="Login">
@@ -44,18 +43,32 @@
 		$.ajax({
 			url : "?login.auth",
 			type : 'POST',
+			dataType: 'json',
 			data : $("#login_form").serialize(),
-			success : function(res) {
-				res = $.parseJSON(res);
-				if (res.code == 0) {
-					alert(res.message);
-				} else if (res.code == 1) {
-					window.location = res.value;
-					//document.location.href = res.value;
-				} else {
-					alert('Problem with sql query');
+			success : function(data) {
+				//alert('success');
+				//alert(data.returnURI);
+
+				window.location = data.returnURI;
+
+			},
+			complete : function(data) {
+                 // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
+                 // TODO
+			},			
+			error : function(request, status, error) {
+				//alert('error');
+				if (request.responseJSON) {
+					errorMsg = request.responseJSON['result'];
 				}
-				return false;
+				/*
+				 * Standard error with standard response text
+				 */
+				else {
+					errorMsg = request.responseText ? request.responseText	: request.statusText;
+				}
+				
+				alert(errorMsg);
 			}
 		});
 		return false;

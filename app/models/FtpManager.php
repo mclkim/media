@@ -15,17 +15,6 @@ class FtpManager extends FtpLibrary {
 	const SELECTION_MODE_FIXED_RATIO = 'fixed-ratio';
 	const SELECTION_MODE_FIXED_SIZE = 'fixed-size';
 	const FILTER_EVERYTHING = 'everything';
-	public function password_verify($username, $password) {
-		logger ( 'password_verify' );
-		/**
-		 * if ($result === false) {
-		 * throw new FtpException('Login incorrect');
-		 * }
-		 * return $result;
-		 */
-		$result = $this->ftp->login ( $username, $password );
-		return ($result) ?: true;
-	}
 	public function prepareVars() {
 		$folder = $this->getCurrentFolder ();
 		$viewMode = $this->getViewMode ();
@@ -40,7 +29,7 @@ class FtpManager extends FtpLibrary {
 			$items = $this->findFiles ( $searchTerm, $filter, $sortBy );
 		
 		return array (
-				'token' => app ()->getToken (),
+				'csrf_token' => app ()->getCsrfToken(),
 				'session_key' => session_id (),
 				'baseUrl' => app ( 'router' )->getBaseUrl (),
 				'currentFolder' => $folder,
