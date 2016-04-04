@@ -60,7 +60,8 @@ class login extends Controller {
 		// $ret ['value'] = rtrim ( $this->router ()->getBaseUrl ( true ), '/' ) . $returnURI;
 		// echo json_encode ( $ret );
 		$result = [ 
-				'returnURI' => rtrim ( $this->router ()->getBaseUrl ( true ), '/' ) . $returnURI 
+				'X_OCTOBER_REDIRECT' => $returnURI,
+				'redirect' => rtrim ( $this->router ()->getBaseUrl ( true ), '/' ) . $returnURI 
 		];
 		return Response::getInstance ()->setContent ( $result );
 	}

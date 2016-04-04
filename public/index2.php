@@ -1,20 +1,29 @@
 <?php
-use Kaiser\Response;
-
 define ( 'ROOT_PATH', dirname ( __FILE__ ) );
 define ( 'BASE_PATH', dirname ( ROOT_PATH ) );
 
 $loader = require_once BASE_PATH . '/vendor/autoload.php';
 
-// use Kaiser\Router;
+use Pimple\Container as PimpleContainer;
+class Test {
+	function index() {
+		phpinfo ();
+	}
+}
+$container = new PimpleContainer ();
+$container ['class_name'] = 'Test';
+// $container ['object_name'] = function ($c) {
+// return new $c ['class_name'] ();
+// };
 
-// phpinfo();
-// var_dump ( Router::getInstance()->getLocalReferer () );
+$container ['object_name'] = $container->factory ( function ($c) {
+	return new $c ['class_name'] ();
+} );
 
-use Aura\Web\WebFactory;
+$controllerObj = $container ['object_name'];
 
-$web_factory = new WebFactory ( $GLOBALS );
-$response = $web_factory->newResponse ();
-
-$response->redirect->found( '/hello' );
-echo $response->status->getCode ();
+// call_user_func_array ( [
+// $controllerObj,
+// $action
+// ], [ ] );
+$controllerObj->index ();

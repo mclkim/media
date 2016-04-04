@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+ <meta name="csrf-token" content="{csrf_token}">
 <title>Login</title>
 <script src="_template/assets/js/jquery-1.12.0.min.js?v313"></script>
 <link rel="stylesheet" href="_template/partials/login/css/style.css">
@@ -33,42 +34,50 @@
 					</footer>
 				</form>
 			</fieldset>
+        	<!-- Flash Messages -->
+      	  	<div id="layout-flash-messages"></div>
 		</div>
 		<!-- end login-form -->
 	</div>
 </body>
 
 <script type="text/javascript">
-	$(document).on("click", '#login_bt', function() {
+	$(document).on("click",'#login_bt',function() {
 		$.ajax({
 			url : "?login.auth",
 			type : 'POST',
-			dataType: 'json',
+			dataType : 'json',
 			data : $("#login_form").serialize(),
-			success : function(data) {
+			success : function(data, textStatus, jqXHR) {
+				if (data.responseJSON) {
+					alert('success');
+				}
 				//alert('success');
 				//alert(data.returnURI);
-
-				window.location = data.returnURI;
+				if (data.redirect)
+					window.location.href = data.redirect				
+				//window.location = data.redirect;
 
 			},
-			complete : function(data) {
-                 // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
-                 // TODO
-			},			
-			error : function(request, status, error) {
+			complete : function(data, textStatus, jqXHR) {
+				// 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
+				// TODO
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
 				//alert('error');
-				if (request.responseJSON) {
-					errorMsg = request.responseJSON['result'];
+				if (jqXHR.responseJSON) {
+					message = jqXHR.responseJSON['result'];
 				}
 				/*
 				 * Standard error with standard response text
 				 */
 				else {
-					errorMsg = request.responseText ? request.responseText	: request.statusText;
+					message = jqXHR.responseText ? jqXHR.responseText
+							: jqXHR.statusText;
 				}
 				
-				alert(errorMsg);
+				if (message)
+				alert(message);
 			}
 		});
 		return false;
