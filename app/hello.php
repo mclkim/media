@@ -5,6 +5,6 @@ class Hello extends Controller {
 		return false;
 	}
 	function execute() {
-		phpinfo ();
+		echo 'hello world';
 	}
 }
