@@ -49,22 +49,14 @@
 			dataType : 'json',
 			data : $("#login_form").serialize(),
 			success : function(data, textStatus, jqXHR) {
-				if (data.responseJSON) {
-					alert('success');
-				}
-				//alert('success');
-				//alert(data.returnURI);
 				if (data.redirect)
 					window.location.href = data.redirect				
-				//window.location = data.redirect;
-
 			},
 			complete : function(data, textStatus, jqXHR) {
 				// 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
 				// TODO
 			},
 			error : function(jqXHR, textStatus, errorThrown) {
-				//alert('error');
 				if (jqXHR.responseJSON) {
 					message = jqXHR.responseJSON['result'];
 				}

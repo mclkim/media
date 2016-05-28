@@ -13,9 +13,8 @@ class manager extends Controller {
 		return true;
 	}
 	public function onUpload() {
-		logger ( 'onUpload' );
-		logger ( $_POST );
-		logger ( $_FILES );
+		$this->debug ( $_POST );
+		$this->debug ( $_FILES );
 		
 		$config = $this->container->get ( 'config' );
 		$ftp = $this->container->get ( 'ftp' );
@@ -32,7 +31,6 @@ class manager extends Controller {
 		if (($file = $upload->getFiles ()) !== false) {
 			$model = new \App\Models\FtpManager ( $ftp );
 			
-			// $model->uploadFile ( $path, $file );
 			if (! $model->uploadFile ( $path, $file )) {
 				throw new SystemException ( 'Error saving remote file to a temporary location' );
 			}
@@ -41,8 +39,7 @@ class manager extends Controller {
 		}
 	}
 	public function onSearch() {
-		logger ( 'onSearch' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$search = $this->getParameter ( 'search' );
 		
@@ -65,8 +62,7 @@ class manager extends Controller {
 		];
 	}
 	function onGoToFolder() {
-		logger ( 'onGoToFolder' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$path = $this->getParameter ( 'path' );
 		
@@ -88,8 +84,7 @@ class manager extends Controller {
 		];
 	}
 	public function onGenerateThumbnails() {
-		logger ( 'onGenerateThumbnails' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$batch = $this->getParameter ( 'batch' );
 		
@@ -119,8 +114,7 @@ class manager extends Controller {
 		];
 	}
 	public function onGetSidebarThumbnail() {
-		logger ( 'onGetSidebarThumbnail' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$path = $this->getParameter ( 'path' );
 		$path = FtpLibrary::validatePath ( $path );
@@ -153,8 +147,7 @@ class manager extends Controller {
 		];
 	}
 	public function onChangeView() {
-		logger ( 'onChangeView' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$viewMode = $this->getParameter ( 'view' );
 		$path = $this->getParameter ( 'path' );
@@ -181,8 +174,7 @@ class manager extends Controller {
 		];
 	}
 	public function onSetFilter() {
-		logger ( 'onSetFilter' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$filter = $this->getParameter ( 'filter' );
 		$path = $this->getParameter ( 'path' );
@@ -207,8 +199,7 @@ class manager extends Controller {
 		];
 	}
 	public function onSetSorting() {
-		logger ( 'onSetSorting' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$sortBy = $this->getParameter ( 'sortBy' );
 		$path = $this->getParameter ( 'path' );
@@ -233,8 +224,7 @@ class manager extends Controller {
 		];
 	}
 	public function onDelete() {
-		logger ( 'onDelete' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$paths = $this->getParameter ( 'paths' );
 		
@@ -272,8 +262,7 @@ class manager extends Controller {
 		];
 	}
 	public function onDownload() {
-		logger ( 'onDownload' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$paths = $this->getParameter ( 'paths' );
 		
@@ -310,18 +299,13 @@ class manager extends Controller {
 			header ( 'Cache-Control: max-age=60, must-revalidate' );
 			$fileDownload->sendDownload ( $zipfile );
 		} else {
-			// logger ( $folderToDownload );
-			// logger ( $filesToDownload );
 			$path = array_pop ( $filesToDownload );
-			// logger ( $path );
 			$filename = FtpLibraryItem::getInstance ()->getbasename ( $path );
 			
 			$tempFilePath = $model->getLocalTempFilePath ();
 			if (! $model->downloadFile ( $path, $tempFilePath )) {
 				throw new SystemException ( 'Error saving remote file to a temporary location' );
 			}
-			// logger ( $tempFilePath );
-			// logger ( $filename );
 			$fileDownload = FileDownload::createFromFilePath ( $tempFilePath );
 			
 			header ( 'Set-Cookie: fileDownload=true; path=/' );
@@ -330,8 +314,7 @@ class manager extends Controller {
 		}
 	}
 	public function onLoadRenamePopup() {
-		logger ( 'onLoadRenamePopup' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$path = $this->getParameter ( 'path' );
 		$type = $this->getParameter ( 'type' );
@@ -347,8 +330,7 @@ class manager extends Controller {
 		return $tpl->fetch ( "rename_form" );
 	}
 	public function onApplyName() {
-		logger ( 'onApplyName' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$name = $this->getParameter ( 'name' );
 		$originalPath = $this->getParameter ( 'originalPath' );
@@ -382,8 +364,7 @@ class manager extends Controller {
 		];
 	}
 	public function onCreateFolder() {
-		logger ( 'onCreateFolder' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$name = $this->getParameter ( 'name' );
 		$path = $this->getParameter ( 'path' );
@@ -413,8 +394,7 @@ class manager extends Controller {
 		];
 	}
 	public function onLoadMovePopup() {
-		logger ( 'onLoadMovePopup' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$exclude = $this->getParameter ( 'exclude', [ ] );
 		if (! is_array ( $exclude )) {
@@ -439,8 +419,6 @@ class manager extends Controller {
 			$folderList [$path] = $name;
 		}
 		
-		// logger ( $folderList );
-		
 		$tpl = $this->container->get ( 'template' );
 		$tpl->assign ( array (
 				'folders' => $folderList 
@@ -450,8 +428,7 @@ class manager extends Controller {
 		return $tpl->fetch ( "move_form" );
 	}
 	public function onMoveItems() {
-		logger ( 'onMoveItems' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$dest = $this->getParameter ( 'dest' );
 		$files = $this->getParameter ( 'files', [ ] );
@@ -480,8 +457,7 @@ class manager extends Controller {
 		];
 	}
 	public function onSetSidebarVisible() {
-		logger ( 'onSetSidebarVisible' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 		
 		$visible = $this->getParameter ( 'visible' );
 		
@@ -490,8 +466,7 @@ class manager extends Controller {
 		$model->setSidebarVisible ( $visible );
 	}
 	public function onLoadPopup() {
-		logger ( 'onLoadPopup' );
-		logger ( $_POST );
+		$this->debug ( $_POST );
 	}
 	protected function validateFileName($name) {
 		if (! preg_match ( '/^[0-9a-z\.\s_\-]+$/i', $name )) {

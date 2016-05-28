@@ -1,5 +1,4 @@
 <?php
-error_reporting ( E_ALL & ~ E_NOTICE );
 /**
  * |-------------------------------------------------------------------
  * |주 경로 상수를 설정
@@ -45,6 +44,7 @@ $loader->addPsr4 ( 'App\\', BASE_PATH . '/app' );
 $loader->addClassMap ( [ 
 		'PluploadHandler' => BASE_PATH . '/vendor/mclkim/kaiser/src/Plupload/PluploadHandler.php' 
 ] );
+
 /**
  * |-------------------------------------------------------------------
  * |Set up dependencies

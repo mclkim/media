@@ -1,7 +1,5 @@
 <?php
 use \Kaiser\Controller;
-/**
- */
 use \Kaiser\Exception\AjaxException;
 use \Kaiser\Response;
 class login extends Controller {
@@ -41,8 +39,7 @@ class login extends Controller {
 			throw new AjaxException ( '비밀번호를 입력해 주세요.' );
 		}
 		
-		$this->debug ( $username );
-		$this->debug ( $password );
+		// $this->debug ( $username );
 		
 		try {
 			$ftp = $this->container->get ( 'ftp' );
@@ -50,6 +47,8 @@ class login extends Controller {
 		} catch ( Exception $e ) {
 			throw new AjaxException ( '아이디 또는 비밀번호가 일치하지 않습니다.' );
 		}
+		
+		// $this->debug ( $password );
 		
 		$_SESSION ['user'] = array (
 				'username' => $username,
@@ -59,6 +58,7 @@ class login extends Controller {
 		// $ret ['code'] = 1;
 		// $ret ['value'] = rtrim ( $this->router ()->getBaseUrl ( true ), '/' ) . $returnURI;
 		// echo json_encode ( $ret );
+		
 		$result = [ 
 				'X_OCTOBER_REDIRECT' => $returnURI,
 				'redirect' => rtrim ( $this->router ()->getBaseUrl ( true ), '/' ) . $returnURI 
